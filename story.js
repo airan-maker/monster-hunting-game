@@ -34,6 +34,7 @@ const NPC_EMOJIS = {
     mom: '👩',
     villager_old_man: '👴',
     shop_owner: '🧑‍💼',
+    nurse: '👩‍⚕️',
     player: '🧑',
     narrator: '📖'
 };
@@ -475,6 +476,7 @@ function getLocationIconEmoji(locationId) {
         hometown: '🏘️',
         lab: '🔬',
         cafe: '☕',
+        pokemon_center: '🏥',
         route1: '🛤️',
         forest_entrance: '🌲',
         forest_deep: '🌳',
@@ -562,6 +564,17 @@ function showLocationScreen(locationId) {
             startExploreFromStory();
         });
         actionsEl.appendChild(exploreBtn);
+    }
+
+    // 치료 버튼 (몬스터 센터)
+    if (location.canHeal) {
+        const healBtn = document.createElement('button');
+        healBtn.className = 'location-action-btn heal-btn';
+        healBtn.textContent = '💊 몬스터 치료하기';
+        healBtn.addEventListener('click', () => {
+            healAllMonsters();
+        });
+        actionsEl.appendChild(healBtn);
     }
 
     // NPC 표시
@@ -729,6 +742,82 @@ function startTrainerBattle(enemyTeam, trainerName) {
     if (enemyTeam.length > 0) {
         startBattle(enemyTeam[0]);
     }
+}
+
+// 모든 몬스터 치료
+function healAllMonsters() {
+    if (gameState.party.length === 0) {
+        showHealMessage('치료할 몬스터가 없습니다.');
+        return;
+    }
+
+    // 모든 파티 몬스터 HP 완전 회복
+    let healedCount = 0;
+    gameState.party.forEach(monster => {
+        if (monster.stats.hp < monster.stats.maxHp) {
+            monster.stats.hp = monster.stats.maxHp;
+            healedCount++;
+        }
+    });
+
+    // 보관함 몬스터도 회복
+    if (gameState.storage) {
+        gameState.storage.forEach(monster => {
+            if (monster.stats.hp < monster.stats.maxHp) {
+                monster.stats.hp = monster.stats.maxHp;
+            }
+        });
+    }
+
+    saveGame();
+
+    if (healedCount > 0) {
+        showHealMessage('모든 몬스터가 완전히 회복되었습니다! 💕');
+    } else {
+        showHealMessage('모든 몬스터가 이미 건강합니다! ✨');
+    }
+}
+
+// 치료 메시지 표시
+function showHealMessage(message) {
+    // 대화 화면을 사용하여 메시지 표시
+    showScreen('story-dialogue-screen');
+
+    const speakerEl = document.getElementById('dialogue-speaker');
+    const textEl = document.getElementById('dialogue-text');
+    const portraitEl = document.getElementById('dialogue-portrait');
+
+    speakerEl.textContent = '간호사 조이';
+    speakerEl.style.display = 'block';
+
+    // 간호사 이미지 설정
+    portraitEl.style.backgroundImage = `url('${IMAGE_PATHS.npcs}nurse_happy.png')`;
+    portraitEl.textContent = '';
+    portraitEl.classList.remove('narrator');
+
+    // 이미지 로드 실패 시 이모지
+    const testImg = new Image();
+    testImg.onerror = () => {
+        portraitEl.style.backgroundImage = 'none';
+        portraitEl.textContent = '👩‍⚕️';
+        portraitEl.style.fontSize = '4rem';
+        portraitEl.style.display = 'flex';
+        portraitEl.style.justifyContent = 'center';
+        portraitEl.style.alignItems = 'center';
+    };
+    testImg.src = `${IMAGE_PATHS.npcs}nurse_happy.png`;
+
+    textEl.textContent = message;
+
+    // 클릭하면 장소 화면으로 돌아가기
+    setTimeout(() => {
+        const dialogueBox = document.querySelector('.dialogue-box');
+        const returnHandler = () => {
+            dialogueBox.removeEventListener('click', returnHandler);
+            showLocationScreen(storyState.currentLocation);
+        };
+        dialogueBox.addEventListener('click', returnHandler);
+    }, 100);
 }
 
 // 스토리 진행 저장

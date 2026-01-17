@@ -1077,7 +1077,51 @@ function showBag() {
 function showResult(title, message, isVictory) {
     document.getElementById('result-title').textContent = title;
     document.getElementById('result-message').textContent = message;
+
+    // 결과 화면 버튼 업데이트
+    const resultContent = document.querySelector('.result-content');
+    const existingButtons = resultContent.querySelectorAll('button');
+    existingButtons.forEach(btn => btn.remove());
+
+    if (isVictory) {
+        // 승리 시 확인 버튼
+        const confirmBtn = document.createElement('button');
+        confirmBtn.textContent = '확인';
+        confirmBtn.onclick = returnToExplore;
+        resultContent.appendChild(confirmBtn);
+    } else {
+        // 패배 시 몬스터 센터로 이동 버튼
+        if (storyState && storyState.isStoryMode) {
+            const healBtn = document.createElement('button');
+            healBtn.textContent = '🏥 몬스터 센터로 이동';
+            healBtn.onclick = goToPokemonCenter;
+            resultContent.appendChild(healBtn);
+        } else {
+            // 자유 모드에서는 그냥 복귀 (HP 회복됨)
+            const confirmBtn = document.createElement('button');
+            confirmBtn.textContent = '확인';
+            confirmBtn.onclick = returnToExplore;
+            resultContent.appendChild(confirmBtn);
+        }
+    }
+
     showScreen('result-screen');
+}
+
+// 몬스터 센터로 이동 (패배 시)
+function goToPokemonCenter() {
+    // 포켓몬 센터 해금 (아직 안 되어있으면)
+    if (!storyState.unlockedLocations.includes('pokemon_center')) {
+        storyState.unlockedLocations.push('pokemon_center');
+    }
+
+    // 현재 위치를 포켓몬 센터로 변경
+    storyState.currentLocation = 'pokemon_center';
+
+    screenHistory = [];
+
+    // 몬스터 센터 화면 표시
+    showLocationScreen('pokemon_center');
 }
 
 // 탐험 화면으로 복귀

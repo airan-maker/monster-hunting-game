@@ -1702,6 +1702,15 @@ h3 {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.5);
 }
 
+.location-action-btn.heal-btn {
+    background: linear-gradient(145deg, #ff6b9d, #c44569);
+    box-shadow: 0 4px 15px rgba(255, 107, 157, 0.4);
+}
+
+.location-action-btn.heal-btn:hover {
+    box-shadow: 0 6px 20px rgba(255, 107, 157, 0.6);
+}
+
 .location-npcs {
     position: relative;
     z-index: 1;

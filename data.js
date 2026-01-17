@@ -579,6 +579,7 @@ const MAP_ICONS = {
     hometown: 'map_icon_town.png',
     lab: 'map_icon_lab.png',
     cafe: 'map_icon_cafe.png',
+    pokemon_center: 'map_icon_pokecenter.png',
     route1: 'map_icon_route.png',
     forest_entrance: 'map_icon_forest.png',
     forest_deep: 'map_icon_forest.png',
@@ -665,6 +666,17 @@ const NPCS = {
         title: '무엇이든 파는 상인',
         image: 'shop_owner.png',
         defaultLocation: 'shop'
+    },
+    nurse: {
+        id: 'nurse',
+        name: '간호사 조이',
+        title: '몬스터 센터 간호사',
+        image: 'nurse_normal.png',
+        images: {
+            normal: 'nurse_normal.png',
+            happy: 'nurse_happy.png'
+        },
+        defaultLocation: 'pokemon_center'
     }
 };
 
@@ -684,9 +696,19 @@ const STORY_LOCATIONS = {
         name: '시작의 마을',
         description: '평화로운 작은 마을. 여기서 모험이 시작된다.',
         background: 'location_hometown.png',
-        connectedTo: ['player_house', 'lab', 'cafe', 'route1'],
+        connectedTo: ['player_house', 'lab', 'cafe', 'pokemon_center', 'route1'],
         npcs: ['rival', 'villager_old_man'],
         canExplore: false
+    },
+    pokemon_center: {
+        id: 'pokemon_center',
+        name: '몬스터 센터',
+        description: '지친 몬스터들을 치료해주는 곳',
+        background: 'location_pokemon_center.png',
+        connectedTo: ['hometown'],
+        npcs: ['nurse'],
+        canExplore: false,
+        canHeal: true
     },
     lab: {
         id: 'lab',
