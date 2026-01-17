@@ -35,6 +35,12 @@ let imageCache = {};
 // 게임 초기화
 function init() {
     loadGame();
+
+    // 스토리 진행 로드
+    if (typeof loadStoryProgress === 'function') {
+        loadStoryProgress();
+    }
+
     preloadImages();
     renderRegions();
     updateUI();
@@ -185,7 +191,8 @@ function restoreMainMenu() {
         <h1 class="game-title">🎮 몬스터 헌터</h1>
         <p class="subtitle">포켓 어드벤처</p>
         <div class="menu-buttons">
-            <button onclick="startNewGame()">새 게임</button>
+            <button onclick="startStoryMode()">스토리 모드</button>
+            <button onclick="startNewGame()">자유 모드</button>
             <button onclick="continueGame()" id="continue-btn">이어하기</button>
             <button onclick="showScreen('pokedex-screen')">도감</button>
         </div>
@@ -200,7 +207,18 @@ function restoreMainMenu() {
 // 이어하기
 function continueGame() {
     if (gameState.party.length > 0) {
-        showScreen('explore-screen');
+        // 스토리 진행 로드
+        if (typeof loadStoryProgress === 'function') {
+            loadStoryProgress();
+        }
+
+        // 스토리 모드인 경우 스토리 맵으로
+        if (gameState.storyProgress && gameState.storyProgress.isStoryMode) {
+            storyState = { ...storyState, ...gameState.storyProgress };
+            showStoryMap();
+        } else {
+            showScreen('explore-screen');
+        }
     }
 }
 
@@ -1071,7 +1089,13 @@ function returnToExplore() {
 
     saveGame();
     screenHistory = [];
-    showScreen('explore-screen');
+
+    // 스토리 모드인 경우 스토리로 복귀
+    if (storyState && storyState.isStoryMode) {
+        returnToStoryAfterBattle();
+    } else {
+        showScreen('explore-screen');
+    }
 }
 
 // 도감 렌더링

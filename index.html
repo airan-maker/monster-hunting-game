@@ -37,9 +37,114 @@
             <h1 class="game-title">🎮 몬스터 헌터</h1>
             <p class="subtitle">포켓 어드벤처</p>
             <div class="menu-buttons">
-                <button onclick="startNewGame()">새 게임</button>
+                <button onclick="startStoryMode()">스토리 모드</button>
+                <button onclick="startNewGame()">자유 모드</button>
                 <button onclick="continueGame()" id="continue-btn">이어하기</button>
                 <button onclick="showScreen('pokedex-screen')">도감</button>
+            </div>
+        </div>
+
+        <!-- 이름 입력 화면 -->
+        <div id="name-input-screen" class="screen">
+            <div class="name-input-container">
+                <h2>🌟 새로운 모험을 시작합니다!</h2>
+                <p>당신의 이름은 무엇인가요?</p>
+                <input type="text" id="player-name-input" maxlength="10" placeholder="이름을 입력하세요">
+                <div class="gender-select">
+                    <p>캐릭터를 선택하세요:</p>
+                    <div class="gender-options">
+                        <button class="gender-btn selected" data-gender="boy" onclick="selectGender('boy')">
+                            <span class="gender-icon">👦</span>
+                            <span>남자</span>
+                        </button>
+                        <button class="gender-btn" data-gender="girl" onclick="selectGender('girl')">
+                            <span class="gender-icon">👧</span>
+                            <span>여자</span>
+                        </button>
+                    </div>
+                </div>
+                <button onclick="confirmPlayerName()" class="confirm-btn">모험 시작!</button>
+            </div>
+        </div>
+
+        <!-- 스토리 대화 화면 -->
+        <div id="story-dialogue-screen" class="screen">
+            <div class="dialogue-background" id="dialogue-background"></div>
+            <div class="dialogue-container">
+                <div class="dialogue-portrait" id="dialogue-portrait"></div>
+                <div class="dialogue-box">
+                    <div class="dialogue-speaker" id="dialogue-speaker">???</div>
+                    <div class="dialogue-text" id="dialogue-text">대화 내용...</div>
+                    <div class="dialogue-indicator">▼</div>
+                </div>
+            </div>
+            <div class="dialogue-choices hidden" id="dialogue-choices">
+                <!-- 선택지가 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 스타터 선택 화면 -->
+        <div id="starter-select-screen" class="screen">
+            <div class="starter-container">
+                <h2>🎁 첫 번째 파트너를 선택하세요!</h2>
+                <div class="starter-grid">
+                    <div class="starter-card" onclick="selectStarter('flameling')">
+                        <div class="starter-sprite">🔥</div>
+                        <div class="starter-name">플레임링</div>
+                        <div class="starter-type fire">불 속성</div>
+                        <div class="starter-desc">뜨거운 열정을 가진 몬스터</div>
+                    </div>
+                    <div class="starter-card" onclick="selectStarter('aquapup')">
+                        <div class="starter-sprite">🐳</div>
+                        <div class="starter-name">아쿠아펍</div>
+                        <div class="starter-type water">물 속성</div>
+                        <div class="starter-desc">물 속에서 자유로운 몬스터</div>
+                    </div>
+                    <div class="starter-card" onclick="selectStarter('sproutie')">
+                        <div class="starter-sprite">🌱</div>
+                        <div class="starter-name">스프라우티</div>
+                        <div class="starter-type grass">풀 속성</div>
+                        <div class="starter-desc">햇빛을 사랑하는 몬스터</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 스토리 맵 화면 -->
+        <div id="story-map-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="showScreen('main-menu')">메뉴</button>
+                <h2>🗺️ 월드 맵</h2>
+                <span id="story-chapter">챕터 1</span>
+            </div>
+            <div class="story-map-container" id="story-map-container">
+                <!-- 맵 위치들이 동적으로 추가됨 -->
+            </div>
+            <div class="bottom-nav">
+                <button onclick="showScreen('party-screen')">🐾 파티</button>
+                <button onclick="showScreen('pokedex-screen')">📖 도감</button>
+                <button onclick="showScreen('bag-screen')">🎒 가방</button>
+            </div>
+        </div>
+
+        <!-- 스토리 장소 화면 -->
+        <div id="story-location-screen" class="screen">
+            <div class="location-background" id="location-background"></div>
+            <div class="location-header">
+                <button class="back-btn" onclick="returnToStoryMap()">← 맵으로</button>
+                <h2 id="location-name">장소 이름</h2>
+            </div>
+            <div class="location-description" id="location-description">
+                장소 설명...
+            </div>
+            <div class="location-actions" id="location-actions">
+                <!-- 장소별 행동 버튼들이 동적으로 추가됨 -->
+            </div>
+            <div class="location-npcs" id="location-npcs">
+                <!-- NPC들이 동적으로 추가됨 -->
+            </div>
+            <div class="location-nav" id="location-nav">
+                <!-- 이동 가능한 장소들이 동적으로 추가됨 -->
             </div>
         </div>
 
@@ -212,6 +317,7 @@
 
     <script src="data.js"></script>
     <script src="auth.js"></script>
+    <script src="story.js"></script>
     <script src="game.js"></script>
 </body>
 </html>

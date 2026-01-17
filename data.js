@@ -566,7 +566,441 @@ const RARITY_NAMES = {
 const IMAGE_PATHS = {
     monsters: 'images/monsters/',
     effects: 'images/effects/',
-    backgrounds: 'images/backgrounds/'
+    backgrounds: 'images/backgrounds/',
+    npcs: 'images/npcs/',
+    locations: 'images/locations/',
+    player: 'images/player/'
+};
+
+// NPC 데이터
+const NPCS = {
+    professor: {
+        id: 'professor',
+        name: '오크 박사',
+        title: '몬스터 연구의 권위자',
+        image: 'professor_normal.png',
+        images: {
+            normal: 'professor_normal.png',
+            happy: 'professor_happy.png',
+            thinking: 'professor_thinking.png',
+            surprised: 'professor_surprised.png'
+        },
+        defaultLocation: 'lab'
+    },
+    rival: {
+        id: 'rival',
+        name: '민수',
+        title: '라이벌 트레이너',
+        image: 'rival_normal.png',
+        images: {
+            normal: 'rival_normal.png',
+            happy: 'rival_happy.png',
+            confident: 'rival_confident.png',
+            surprised: 'rival_surprised.png',
+            sad: 'rival_sad.png'
+        },
+        defaultLocation: 'hometown'
+    },
+    cafe_owner: {
+        id: 'cafe_owner',
+        name: '카페 사장님',
+        title: '포근한 카페의 주인',
+        image: 'cafe_owner_normal.png',
+        images: {
+            normal: 'cafe_owner_normal.png',
+            happy: 'cafe_owner_happy.png',
+            worried: 'cafe_owner_worried.png'
+        },
+        defaultLocation: 'cafe'
+    },
+    stranger: {
+        id: 'stranger',
+        name: '???',
+        title: '수상한 사람',
+        image: 'stranger_normal.png',
+        images: {
+            normal: 'stranger_normal.png',
+            mysterious: 'stranger_mysterious.png',
+            serious: 'stranger_serious.png'
+        },
+        defaultLocation: null
+    },
+    mom: {
+        id: 'mom',
+        name: '엄마',
+        title: '따뜻한 가족',
+        image: 'mom_normal.png',
+        images: {
+            normal: 'mom_normal.png',
+            happy: 'mom_happy.png',
+            worried: 'mom_worried.png'
+        },
+        defaultLocation: 'player_house'
+    },
+    villager_old_man: {
+        id: 'villager_old_man',
+        name: '할아버지',
+        title: '마을의 원로',
+        image: 'villager_old_man.png',
+        defaultLocation: 'hometown'
+    },
+    shop_owner: {
+        id: 'shop_owner',
+        name: '상점 주인',
+        title: '무엇이든 파는 상인',
+        image: 'shop_owner.png',
+        defaultLocation: 'shop'
+    }
+};
+
+// 스토리 장소 데이터
+const STORY_LOCATIONS = {
+    player_house: {
+        id: 'player_house',
+        name: '우리 집',
+        description: '따뜻하고 편안한 나의 집',
+        background: 'location_player_house_inside.png',
+        connectedTo: ['hometown'],
+        npcs: ['mom'],
+        canExplore: false
+    },
+    hometown: {
+        id: 'hometown',
+        name: '시작의 마을',
+        description: '평화로운 작은 마을. 여기서 모험이 시작된다.',
+        background: 'location_hometown.png',
+        connectedTo: ['player_house', 'lab', 'cafe', 'route1'],
+        npcs: ['rival', 'villager_old_man'],
+        canExplore: false
+    },
+    lab: {
+        id: 'lab',
+        name: '몬스터 연구소',
+        description: '오크 박사가 몬스터를 연구하는 곳',
+        background: 'location_lab_inside.png',
+        connectedTo: ['hometown'],
+        npcs: ['professor'],
+        canExplore: false
+    },
+    cafe: {
+        id: 'cafe',
+        name: '포근한 카페',
+        description: '맛있는 음료와 정보를 얻을 수 있는 곳',
+        background: 'location_cafe_inside.png',
+        connectedTo: ['hometown'],
+        npcs: ['cafe_owner'],
+        canExplore: false
+    },
+    route1: {
+        id: 'route1',
+        name: '1번 도로',
+        description: '초원이 펼쳐진 첫 번째 도로',
+        background: 'location_route1.png',
+        connectedTo: ['hometown', 'forest_entrance'],
+        npcs: [],
+        canExplore: true,
+        exploreRegion: 'meadow'
+    },
+    forest_entrance: {
+        id: 'forest_entrance',
+        name: '숲 입구',
+        description: '신비로운 숲의 시작점',
+        background: 'location_forest_entrance.png',
+        connectedTo: ['route1', 'forest_deep'],
+        npcs: [],
+        canExplore: true,
+        exploreRegion: 'forest'
+    },
+    forest_deep: {
+        id: 'forest_deep',
+        name: '숲 깊은 곳',
+        description: '울창한 숲 속 깊은 곳',
+        background: 'location_forest_deep.png',
+        connectedTo: ['forest_entrance', 'lake_area'],
+        npcs: [],
+        canExplore: true,
+        exploreRegion: 'forest'
+    },
+    lake_area: {
+        id: 'lake_area',
+        name: '신비의 호수',
+        description: '맑은 물이 반짝이는 호수',
+        background: 'location_lake.png',
+        connectedTo: ['forest_deep', 'mountain_base'],
+        npcs: [],
+        canExplore: true,
+        exploreRegion: 'lake'
+    },
+    mountain_base: {
+        id: 'mountain_base',
+        name: '산기슭',
+        description: '험준한 산의 입구',
+        background: 'location_mountain_base.png',
+        connectedTo: ['lake_area', 'cave_entrance'],
+        npcs: [],
+        canExplore: true,
+        exploreRegion: 'mountain'
+    },
+    cave_entrance: {
+        id: 'cave_entrance',
+        name: '동굴 입구',
+        description: '어두운 동굴로 들어가는 입구',
+        background: 'location_cave_entrance.png',
+        connectedTo: ['mountain_base'],
+        npcs: [],
+        canExplore: true,
+        exploreRegion: 'cave'
+    }
+};
+
+// 스토리 챕터
+const STORY_CHAPTERS = {
+    chapter1: {
+        id: 'chapter1',
+        name: '모험의 시작',
+        description: '첫 몬스터를 받고 모험을 떠나다',
+        scenes: ['intro', 'wake_up', 'meet_mom', 'go_to_lab', 'meet_professor', 'choose_starter', 'meet_rival'],
+        unlockCondition: null
+    },
+    chapter2: {
+        id: 'chapter2',
+        name: '첫 번째 여정',
+        description: '1번 도로를 지나 숲으로',
+        scenes: ['first_battle_tutorial', 'explore_route1', 'enter_forest'],
+        unlockCondition: { type: 'chapter_complete', value: 'chapter1' }
+    },
+    chapter3: {
+        id: 'chapter3',
+        name: '수상한 그림자',
+        description: '숲에서 만난 미스터리한 인물',
+        scenes: ['forest_encounter', 'meet_stranger', 'stranger_warning'],
+        unlockCondition: { type: 'chapter_complete', value: 'chapter2' }
+    },
+    chapter4: {
+        id: 'chapter4',
+        name: '라이벌과의 대결',
+        description: '민수와의 첫 번째 배틀',
+        scenes: ['rival_challenge', 'rival_battle', 'after_battle'],
+        unlockCondition: { type: 'monsters_caught', value: 3 }
+    }
+};
+
+// 스토리 씬 (대화 및 이벤트)
+const STORY_SCENES = {
+    // Chapter 1: 모험의 시작
+    intro: {
+        id: 'intro',
+        location: null,
+        dialogues: [
+            { speaker: 'professor', emotion: 'happy', text: '안녕! 몬스터의 세계에 온 것을 환영해!' },
+            { speaker: 'professor', emotion: 'normal', text: '내 이름은 오크 박사. 몬스터를 연구하고 있지.' },
+            { speaker: 'professor', emotion: 'thinking', text: '그런데 너의 이름은 뭐니?' }
+        ],
+        nextScene: 'wake_up',
+        action: { type: 'input_name' }
+    },
+    wake_up: {
+        id: 'wake_up',
+        location: 'player_house',
+        dialogues: [
+            { speaker: 'narrator', text: '어느 화창한 아침...' },
+            { speaker: 'player', text: '(기지개를 펴며) 오늘이 바로 그 날이구나!' },
+            { speaker: 'player', text: '드디어 첫 몬스터를 받으러 연구소에 갈 수 있어!' }
+        ],
+        nextScene: 'meet_mom'
+    },
+    meet_mom: {
+        id: 'meet_mom',
+        location: 'player_house',
+        dialogues: [
+            { speaker: 'mom', emotion: 'happy', text: '{playerName}! 드디어 일어났구나.' },
+            { speaker: 'mom', emotion: 'normal', text: '오크 박사님이 연구소에서 기다리고 계셔.' },
+            { speaker: 'mom', emotion: 'worried', text: '조심해서 다녀와. 그리고 꼭 연락해!' },
+            { speaker: 'player', text: '알았어 엄마! 다녀올게!' }
+        ],
+        nextScene: null,
+        action: { type: 'unlock_location', value: 'hometown' }
+    },
+    go_to_lab: {
+        id: 'go_to_lab',
+        location: 'hometown',
+        dialogues: [
+            { speaker: 'narrator', text: '마을을 가로질러 연구소로 향한다...' },
+            { speaker: 'villager_old_man', text: '오, {playerName}! 오늘 드디어 첫 몬스터를 받는구나?' },
+            { speaker: 'player', text: '네! 기대돼요!' },
+            { speaker: 'villager_old_man', text: '좋은 트레이너가 되길 바란다!' }
+        ],
+        nextScene: null,
+        action: { type: 'unlock_location', value: 'lab' }
+    },
+    meet_professor: {
+        id: 'meet_professor',
+        location: 'lab',
+        dialogues: [
+            { speaker: 'professor', emotion: 'happy', text: '오, {playerName}! 왔구나!' },
+            { speaker: 'professor', emotion: 'normal', text: '드디어 네가 첫 몬스터를 받을 때가 됐어.' },
+            { speaker: 'professor', emotion: 'thinking', text: '여기 세 마리의 몬스터가 있단다.' },
+            { speaker: 'professor', emotion: 'normal', text: '불 속성의 플레임링, 물 속성의 아쿠아펍, 풀 속성의 스프라우티.' },
+            { speaker: 'professor', emotion: 'happy', text: '어떤 몬스터를 선택하겠니?' }
+        ],
+        nextScene: 'choose_starter',
+        action: { type: 'choose_starter' }
+    },
+    choose_starter: {
+        id: 'choose_starter',
+        location: 'lab',
+        dialogues: [
+            { speaker: 'professor', emotion: 'happy', text: '{starterName}을(를) 선택했구나! 좋은 선택이야.' },
+            { speaker: 'professor', emotion: 'normal', text: '이 몬스터볼과 도감도 함께 가져가렴.' },
+            { speaker: 'player', text: '감사합니다, 박사님!' },
+            { speaker: 'professor', emotion: 'thinking', text: '아, 그리고 민수도 아까 첫 몬스터를 받아갔단다.' },
+            { speaker: 'professor', emotion: 'happy', text: '민수와 좋은 라이벌이 되길 바래!' }
+        ],
+        nextScene: null,
+        action: { type: 'receive_items', items: { pokeball: 5 } }
+    },
+    meet_rival: {
+        id: 'meet_rival',
+        location: 'hometown',
+        dialogues: [
+            { speaker: 'rival', emotion: 'confident', text: '오! {playerName}! 너도 첫 몬스터 받았구나?' },
+            { speaker: 'player', text: '응, 민수! 너도 받았다며?' },
+            { speaker: 'rival', emotion: 'happy', text: '물론이지! 나는 {rivalStarter}을(를) 골랐어.' },
+            { speaker: 'rival', emotion: 'confident', text: '언젠가 우리 배틀 한 판 해야지!' },
+            { speaker: 'rival', emotion: 'normal', text: '그때까지 열심히 훈련해둬! 안녕!' },
+            { speaker: 'narrator', text: '민수는 어디론가 뛰어갔다...' }
+        ],
+        nextScene: null,
+        action: { type: 'complete_chapter', value: 'chapter1' }
+    },
+
+    // Chapter 2: 첫 번째 여정
+    first_battle_tutorial: {
+        id: 'first_battle_tutorial',
+        location: 'route1',
+        dialogues: [
+            { speaker: 'narrator', text: '풀숲에서 무언가 움직인다!' },
+            { speaker: 'player', text: '야생 몬스터다! 드디어 첫 배틀이야!' }
+        ],
+        nextScene: null,
+        action: { type: 'wild_battle', level: 3 }
+    },
+    explore_route1: {
+        id: 'explore_route1',
+        location: 'route1',
+        dialogues: [
+            { speaker: 'narrator', text: '1번 도로를 탐험하며 여러 몬스터를 만났다.' },
+            { speaker: 'player', text: '이제 좀 감이 잡히는 것 같아!' }
+        ],
+        nextScene: null,
+        action: { type: 'unlock_location', value: 'forest_entrance' }
+    },
+    enter_forest: {
+        id: 'enter_forest',
+        location: 'forest_entrance',
+        dialogues: [
+            { speaker: 'narrator', text: '숲의 입구에 도착했다. 나무들이 울창하다.' },
+            { speaker: 'player', text: '여기에는 어떤 몬스터들이 있을까...' },
+            { speaker: 'narrator', text: '갑자기 이상한 기운이 느껴진다...' }
+        ],
+        nextScene: null,
+        action: { type: 'complete_chapter', value: 'chapter2' }
+    },
+
+    // Chapter 3: 수상한 그림자
+    forest_encounter: {
+        id: 'forest_encounter',
+        location: 'forest_deep',
+        dialogues: [
+            { speaker: 'narrator', text: '숲 깊은 곳에서 수상한 그림자가 보인다...' },
+            { speaker: 'player', text: '거기 누구세요?' }
+        ],
+        nextScene: 'meet_stranger'
+    },
+    meet_stranger: {
+        id: 'meet_stranger',
+        location: 'forest_deep',
+        dialogues: [
+            { speaker: 'stranger', emotion: 'mysterious', text: '...' },
+            { speaker: 'stranger', emotion: 'normal', text: '흥미롭군. 새로운 트레이너인가.' },
+            { speaker: 'player', text: '당신은 누구세요?' },
+            { speaker: 'stranger', emotion: 'mysterious', text: '이름은 중요하지 않아.' },
+            { speaker: 'stranger', emotion: 'serious', text: '다만... 곧 큰 일이 일어날 거야.' }
+        ],
+        nextScene: 'stranger_warning'
+    },
+    stranger_warning: {
+        id: 'stranger_warning',
+        location: 'forest_deep',
+        dialogues: [
+            { speaker: 'stranger', emotion: 'serious', text: '마법의 공간... 그곳에서 무언가가 깨어나고 있어.' },
+            { speaker: 'player', text: '마법의 공간이요? 그게 뭔데요?' },
+            { speaker: 'stranger', emotion: 'mysterious', text: '때가 되면 알게 될 거야...' },
+            { speaker: 'narrator', text: '수상한 사람은 그림자 속으로 사라졌다.' },
+            { speaker: 'player', text: '뭐지... 조금 무서운데...' }
+        ],
+        nextScene: null,
+        action: { type: 'complete_chapter', value: 'chapter3' }
+    },
+
+    // Chapter 4: 라이벌과의 대결
+    rival_challenge: {
+        id: 'rival_challenge',
+        location: 'lake_area',
+        dialogues: [
+            { speaker: 'rival', emotion: 'confident', text: '{playerName}! 드디어 찾았다!' },
+            { speaker: 'player', text: '민수? 여기서 뭐해?' },
+            { speaker: 'rival', emotion: 'happy', text: '뭐긴 뭐야, 너랑 배틀하려고 왔지!' },
+            { speaker: 'rival', emotion: 'confident', text: '나도 몬스터들을 많이 키웠거든.' },
+            { speaker: 'rival', emotion: 'normal', text: '자, 준비됐어?' }
+        ],
+        nextScene: 'rival_battle',
+        action: { type: 'rival_battle' }
+    },
+    rival_battle: {
+        id: 'rival_battle',
+        location: 'lake_area',
+        dialogues: [],
+        nextScene: 'after_battle'
+    },
+    after_battle: {
+        id: 'after_battle',
+        location: 'lake_area',
+        dialogues: [
+            { speaker: 'rival', emotion: 'sad', text: '으앙... 졌어...' },
+            { speaker: 'rival', emotion: 'normal', text: '역시 {playerName}은 대단해!' },
+            { speaker: 'rival', emotion: 'confident', text: '하지만 다음엔 내가 이길 거야!' },
+            { speaker: 'player', text: '다음에 또 하자, 민수!' },
+            { speaker: 'rival', emotion: 'happy', text: '물론이지! 더 강해져서 다시 올게!' },
+            { speaker: 'narrator', text: '민수와의 첫 번째 대결에서 승리했다!' }
+        ],
+        nextScene: null,
+        action: { type: 'complete_chapter', value: 'chapter4' }
+    },
+
+    // 카페 대화
+    cafe_chat: {
+        id: 'cafe_chat',
+        location: 'cafe',
+        dialogues: [
+            { speaker: 'cafe_owner', emotion: 'happy', text: '어서와! 무엇을 도와줄까?' },
+            { speaker: 'player', text: '안녕하세요! 혹시 이 근처에 대해 아시는 게 있으세요?' },
+            { speaker: 'cafe_owner', emotion: 'normal', text: '이 근처엔 다양한 몬스터들이 있지.' },
+            { speaker: 'cafe_owner', emotion: 'worried', text: '특히 숲 깊은 곳은 조심해야 해.' },
+            { speaker: 'cafe_owner', emotion: 'happy', text: '피곤하면 언제든 쉬러 와!' }
+        ],
+        nextScene: null
+    }
+};
+
+// 스타터 몬스터 목록
+const STARTER_MONSTERS = ['flameling', 'aquapup', 'sproutie'];
+
+// 라이벌 스타터 선택 (플레이어 선택에 따라 상성 유리한 몬스터)
+const RIVAL_STARTER_MAP = {
+    flameling: 'aquapup',    // 불 → 물
+    aquapup: 'sproutie',     // 물 → 풀
+    sproutie: 'flameling'    // 풀 → 불
 };
 
 // 이미지 존재 체크 (기본값은 emoji 사용)
