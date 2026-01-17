@@ -1328,6 +1328,13 @@ h3 {
     font-size: 2rem;
 }
 
+.gender-icon-img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    border-radius: 50%;
+}
+
 .confirm-btn {
     padding: 15px 40px;
     font-size: 1.1rem;

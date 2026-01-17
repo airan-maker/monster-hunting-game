@@ -44,12 +44,6 @@ function init() {
     preloadImages();
     renderRegions();
     updateUI();
-
-    // 이어하기 버튼 상태 설정
-    const continueBtn = document.getElementById('continue-btn');
-    if (gameState.party.length === 0) {
-        continueBtn.disabled = true;
-    }
 }
 
 // 이미지 프리로드
@@ -105,9 +99,20 @@ function checkImageExists(url) {
     });
 }
 
-// 새 게임 시작
-function startNewGame() {
-    // 초기화
+// 탐험 모드 시작
+function startExploreMode() {
+    // 파티에 몬스터가 있으면 바로 탐험 화면으로
+    if (gameState.party.length > 0) {
+        showScreen('explore-screen');
+    } else {
+        // 파티가 비어있으면 스타터 선택
+        initializeExploreMode();
+        showExploreStarterSelection();
+    }
+}
+
+// 탐험 모드 초기화 (새 게임)
+function initializeExploreMode() {
     gameState = {
         playerName: '트레이너',
         party: [],
@@ -123,23 +128,21 @@ function startNewGame() {
         money: 1000,
         currentRegion: null
     };
-
-    // 스타터 몬스터 선택
-    showStarterSelection();
 }
 
-// 스타터 선택 화면
-function showStarterSelection() {
+// 탐험 모드 스타터 선택 화면
+function showExploreStarterSelection() {
     const starters = ['flameling', 'aquapup', 'sproutie'];
 
     const mainMenu = document.getElementById('main-menu');
     mainMenu.innerHTML = `
+        <button class="back-btn" onclick="restoreMainMenu()" style="position: absolute; top: 20px; left: 20px;">← 뒤로</button>
         <h2 style="color: #ffd700; margin-bottom: 30px;">첫 번째 파트너를 선택하세요!</h2>
         <div class="starter-grid" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
             ${starters.map(id => {
                 const monster = MONSTERS[id];
                 return `
-                    <div class="starter-card" onclick="selectStarter('${id}')" style="
+                    <div class="starter-card" onclick="selectExploreStarter('${id}')" style="
                         background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
                         border-radius: 15px;
                         padding: 20px;
@@ -164,8 +167,8 @@ function showStarterSelection() {
     `;
 }
 
-// 스타터 선택
-function selectStarter(monsterId) {
+// 탐험 모드 스타터 선택 (game.js 전용)
+function selectExploreStarter(monsterId) {
     const monster = createMonsterInstance(monsterId, 5);
     gameState.party.push(monster);
     gameState.pokedex[monsterId] = { discovered: true, caught: true };
@@ -192,8 +195,7 @@ function restoreMainMenu() {
         <p class="subtitle">포켓 어드벤처</p>
         <div class="menu-buttons">
             <button onclick="startStoryMode()">스토리 모드</button>
-            <button onclick="startNewGame()">자유 모드</button>
-            <button onclick="continueGame()" id="continue-btn">이어하기</button>
+            <button onclick="startExploreMode()">탐험 모드</button>
             <button onclick="showScreen('pokedex-screen')">도감</button>
         </div>
     `;
@@ -201,24 +203,6 @@ function restoreMainMenu() {
     // 사용자 표시 업데이트
     if (typeof updateUserDisplay === 'function') {
         updateUserDisplay();
-    }
-}
-
-// 이어하기
-function continueGame() {
-    if (gameState.party.length > 0) {
-        // 스토리 진행 로드
-        if (typeof loadStoryProgress === 'function') {
-            loadStoryProgress();
-        }
-
-        // 스토리 모드인 경우 스토리 맵으로
-        if (gameState.storyProgress && gameState.storyProgress.isStoryMode) {
-            storyState = { ...storyState, ...gameState.storyProgress };
-            showStoryMap();
-        } else {
-            showScreen('explore-screen');
-        }
     }
 }
 

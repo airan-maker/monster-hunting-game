@@ -38,8 +38,7 @@
             <p class="subtitle">포켓 어드벤처</p>
             <div class="menu-buttons">
                 <button onclick="startStoryMode()">스토리 모드</button>
-                <button onclick="startNewGame()">자유 모드</button>
-                <button onclick="continueGame()" id="continue-btn">이어하기</button>
+                <button onclick="startExploreMode()">탐험 모드</button>
                 <button onclick="showScreen('pokedex-screen')">도감</button>
             </div>
         </div>
@@ -54,11 +53,13 @@
                     <p>캐릭터를 선택하세요:</p>
                     <div class="gender-options">
                         <button class="gender-btn selected" data-gender="boy" onclick="selectGender('boy')">
-                            <span class="gender-icon">👦</span>
+                            <img src="images/player/player_boy_icon.png" alt="남자" class="gender-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <span class="gender-icon" style="display:none;">👦</span>
                             <span>남자</span>
                         </button>
                         <button class="gender-btn" data-gender="girl" onclick="selectGender('girl')">
-                            <span class="gender-icon">👧</span>
+                            <img src="images/player/player_girl_icon.png" alt="여자" class="gender-icon-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <span class="gender-icon" style="display:none;">👧</span>
                             <span>여자</span>
                         </button>
                     </div>
