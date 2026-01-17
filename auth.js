@@ -1,12 +1,13 @@
 // Firebase 설정
 // 주의: 실제 배포 시에는 본인의 Firebase 프로젝트 설정으로 교체해야 합니다
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyAS8GEGIZwnULudx2b3TVCEdzrASTo-b8Q",
+    authDomain: "monster-hunting-game.firebaseapp.com",
+    projectId: "monster-hunting-game",
+    storageBucket: "monster-hunting-game.firebasestorage.app",
+    messagingSenderId: "323067244006",
+    appId: "1:323067244006:web:85c8dea848de61a7cf7a27",
+    measurementId: "G-44RCBZMDQ3"
 };
 
 // Firebase 초기화
