@@ -830,8 +830,10 @@ const STORY_SCENES = {
         location: null,
         dialogues: [
             { speaker: 'professor', emotion: 'happy', text: '안녕! 몬스터의 세계에 온 것을 환영해!' },
-            { speaker: 'professor', emotion: 'normal', text: '내 이름은 오크 박사. 몬스터를 연구하고 있지.' },
-            { speaker: 'professor', emotion: 'thinking', text: '그런데 너의 이름은 뭐니?' }
+            { speaker: 'professor', emotion: 'normal', text: '내 이름은 오크 박사. 이 지역에서 몬스터를 연구하고 있지.' },
+            { speaker: 'professor', emotion: 'thinking', text: '이 세계에는 수많은 몬스터들이 살고 있어. 어떤 건 친근하고, 어떤 건 위험하기도 하지.' },
+            { speaker: 'professor', emotion: 'happy', text: '하지만 마음을 열면 누구와도 친구가 될 수 있단다.' },
+            { speaker: 'professor', emotion: 'thinking', text: '그런데... 너의 이름은 뭐니?' }
         ],
         nextScene: 'wake_up',
         action: { type: 'input_name' }
@@ -840,9 +842,11 @@ const STORY_SCENES = {
         id: 'wake_up',
         location: 'player_house',
         dialogues: [
-            { speaker: 'narrator', text: '어느 화창한 아침...' },
-            { speaker: 'player', text: '(기지개를 펴며) 오늘이 바로 그 날이구나!' },
-            { speaker: 'player', text: '드디어 첫 몬스터를 받으러 연구소에 갈 수 있어!' }
+            { speaker: 'narrator', text: '따스한 햇살이 창문으로 들어오는 어느 화창한 아침...' },
+            { speaker: 'player', text: '(눈을 비비며) 으음... 벌써 아침이야?' },
+            { speaker: 'player', text: '(갑자기 벌떡 일어나며) 잠깐, 오늘이 바로 그 날이잖아!' },
+            { speaker: 'player', text: '드디어 첫 몬스터를 받으러 연구소에 갈 수 있어!' },
+            { speaker: 'player', text: '어떤 몬스터가 나를 기다리고 있을까... 두근두근!' }
         ],
         nextScene: 'meet_mom'
     },
@@ -850,10 +854,15 @@ const STORY_SCENES = {
         id: 'meet_mom',
         location: 'player_house',
         dialogues: [
-            { speaker: 'mom', emotion: 'happy', text: '{playerName}! 드디어 일어났구나.' },
-            { speaker: 'mom', emotion: 'normal', text: '오크 박사님이 연구소에서 기다리고 계셔.' },
-            { speaker: 'mom', emotion: 'worried', text: '조심해서 다녀와. 그리고 꼭 연락해!' },
-            { speaker: 'player', text: '알았어 엄마! 다녀올게!' }
+            { speaker: 'mom', emotion: 'happy', text: '{playerName}! 드디어 일어났구나. 기다리고 있었어.' },
+            { speaker: 'player', text: '엄마! 오늘 연구소에 갈 수 있는 거지?' },
+            { speaker: 'mom', emotion: 'happy', text: '물론이지. 오크 박사님이 연구소에서 기다리고 계셔.' },
+            { speaker: 'mom', emotion: 'normal', text: '박사님이 특별히 너를 위해 몬스터를 준비해두셨대.' },
+            { speaker: 'player', text: '정말?! 최고다!' },
+            { speaker: 'mom', emotion: 'worried', text: '하지만... {playerName}, 세상은 넓고 위험한 곳도 있어.' },
+            { speaker: 'mom', emotion: 'normal', text: '항상 몬스터 친구들을 소중히 여기고, 무리하지 말아줘.' },
+            { speaker: 'mom', emotion: 'happy', text: '조심해서 다녀와. 그리고 가끔 집에도 들러줘!' },
+            { speaker: 'player', text: '알았어 엄마! 걱정 마. 다녀올게!' }
         ],
         nextScene: null,
         action: { type: 'unlock_location', value: 'hometown' }
@@ -862,10 +871,14 @@ const STORY_SCENES = {
         id: 'go_to_lab',
         location: 'hometown',
         dialogues: [
-            { speaker: 'narrator', text: '마을을 가로질러 연구소로 향한다...' },
-            { speaker: 'villager_old_man', text: '오, {playerName}! 오늘 드디어 첫 몬스터를 받는구나?' },
-            { speaker: 'player', text: '네! 기대돼요!' },
-            { speaker: 'villager_old_man', text: '좋은 트레이너가 되길 바란다!' }
+            { speaker: 'narrator', text: '설레는 마음으로 마을을 가로질러 연구소로 향한다.' },
+            { speaker: 'narrator', text: '평화로운 시작의 마을. 작지만 따뜻한 곳이다.' },
+            { speaker: 'villager_old_man', text: '오, {playerName}! 벌써 이렇게 컸구나.' },
+            { speaker: 'player', text: '안녕하세요, 할아버지!' },
+            { speaker: 'villager_old_man', text: '오늘 드디어 첫 몬스터를 받는 날이지?' },
+            { speaker: 'player', text: '네! 정말 기대돼요!' },
+            { speaker: 'villager_old_man', text: '좋은 트레이너가 되길 바란다. 몬스터를 사랑하는 마음을 잊지 말거라.' },
+            { speaker: 'villager_old_man', text: '아, 그리고 연구소는 마을 북쪽에 있단다. 어서 가보거라!' }
         ],
         nextScene: null,
         action: { type: 'unlock_location', value: 'lab' }
@@ -874,11 +887,17 @@ const STORY_SCENES = {
         id: 'meet_professor',
         location: 'lab',
         dialogues: [
-            { speaker: 'professor', emotion: 'happy', text: '오, {playerName}! 왔구나!' },
-            { speaker: 'professor', emotion: 'normal', text: '드디어 네가 첫 몬스터를 받을 때가 됐어.' },
-            { speaker: 'professor', emotion: 'thinking', text: '여기 세 마리의 몬스터가 있단다.' },
-            { speaker: 'professor', emotion: 'normal', text: '불 속성의 플레임링, 물 속성의 아쿠아펍, 풀 속성의 스프라우티.' },
-            { speaker: 'professor', emotion: 'happy', text: '어떤 몬스터를 선택하겠니?' }
+            { speaker: 'narrator', text: '연구소 안은 다양한 연구 장비와 책들로 가득 차 있다.' },
+            { speaker: 'professor', emotion: 'happy', text: '오, {playerName}! 드디어 왔구나! 기다리고 있었어.' },
+            { speaker: 'player', text: '안녕하세요, 박사님!' },
+            { speaker: 'professor', emotion: 'normal', text: '오늘이 바로 네가 첫 몬스터를 받는 특별한 날이야.' },
+            { speaker: 'professor', emotion: 'thinking', text: '몬스터와 함께하는 여행... 그것은 단순한 모험이 아니란다.' },
+            { speaker: 'professor', emotion: 'normal', text: '서로를 믿고 성장하는 소중한 경험이지.' },
+            { speaker: 'professor', emotion: 'happy', text: '자, 여기를 보렴. 세 마리의 몬스터가 널 기다리고 있어.' },
+            { speaker: 'professor', emotion: 'normal', text: '불꽃의 열정을 가진 플레임링...' },
+            { speaker: 'professor', emotion: 'normal', text: '물처럼 유연한 아쿠아펍...' },
+            { speaker: 'professor', emotion: 'normal', text: '그리고 자연의 힘을 품은 스프라우티.' },
+            { speaker: 'professor', emotion: 'thinking', text: '각자 다른 매력이 있지. 네 마음이 이끄는 대로 선택하렴.' }
         ],
         nextScene: 'choose_starter',
         action: { type: 'choose_starter' }
@@ -887,11 +906,18 @@ const STORY_SCENES = {
         id: 'choose_starter',
         location: 'lab',
         dialogues: [
-            { speaker: 'professor', emotion: 'happy', text: '{starterName}을(를) 선택했구나! 좋은 선택이야.' },
-            { speaker: 'professor', emotion: 'normal', text: '이 몬스터볼과 도감도 함께 가져가렴.' },
-            { speaker: 'player', text: '감사합니다, 박사님!' },
-            { speaker: 'professor', emotion: 'thinking', text: '아, 그리고 민수도 아까 첫 몬스터를 받아갔단다.' },
-            { speaker: 'professor', emotion: 'happy', text: '민수와 좋은 라이벌이 되길 바래!' }
+            { speaker: 'professor', emotion: 'happy', text: '오, {starterName}을(를) 선택했구나!' },
+            { speaker: 'professor', emotion: 'normal', text: '좋은 선택이야. 이 아이와 함께라면 어떤 어려움도 이겨낼 수 있을 거야.' },
+            { speaker: 'player', text: '안녕, {starterName}! 앞으로 잘 부탁해!' },
+            { speaker: 'professor', emotion: 'happy', text: '호호, {starterName}도 기뻐 보이는구나.' },
+            { speaker: 'professor', emotion: 'normal', text: '자, 이것도 가져가렴. 몬스터볼 5개와 몬스터 도감이야.' },
+            { speaker: 'player', text: '와, 감사합니다, 박사님!' },
+            { speaker: 'professor', emotion: 'thinking', text: '도감에는 네가 만나는 몬스터들의 정보가 기록된단다.' },
+            { speaker: 'professor', emotion: 'normal', text: '많은 몬스터를 만나고, 도감을 채워보렴!' },
+            { speaker: 'professor', emotion: 'happy', text: '아, 그리고 민수도 아까 왔었어. 벌써 첫 몬스터를 받아갔지.' },
+            { speaker: 'player', text: '민수가요? 뭘 골랐어요?' },
+            { speaker: 'professor', emotion: 'thinking', text: '직접 만나서 확인해보렴. 좋은 라이벌이 될 거야!' },
+            { speaker: 'professor', emotion: 'happy', text: '자, 이제 모험을 시작할 시간이야. 행운을 빌어!' }
         ],
         nextScene: null,
         action: { type: 'receive_items', items: { pokeball: 5 } }
@@ -900,12 +926,22 @@ const STORY_SCENES = {
         id: 'meet_rival',
         location: 'hometown',
         dialogues: [
-            { speaker: 'rival', emotion: 'confident', text: '오! {playerName}! 너도 첫 몬스터 받았구나?' },
-            { speaker: 'player', text: '응, 민수! 너도 받았다며?' },
-            { speaker: 'rival', emotion: 'happy', text: '물론이지! 나는 {rivalStarter}을(를) 골랐어.' },
-            { speaker: 'rival', emotion: 'confident', text: '언젠가 우리 배틀 한 판 해야지!' },
-            { speaker: 'rival', emotion: 'normal', text: '그때까지 열심히 훈련해둬! 안녕!' },
-            { speaker: 'narrator', text: '민수는 어디론가 뛰어갔다...' }
+            { speaker: 'narrator', text: '연구소를 나서자 익숙한 목소리가 들린다.' },
+            { speaker: 'rival', emotion: 'confident', text: '거기 서! {playerName}!' },
+            { speaker: 'player', text: '어, 민수? 오랜만이다!' },
+            { speaker: 'rival', emotion: 'happy', text: '오랜만이긴! 너도 드디어 첫 몬스터 받았구나?' },
+            { speaker: 'player', text: '응! 방금 받았어. 너는 뭘 골랐어?' },
+            { speaker: 'rival', emotion: 'confident', text: '나? 당연히 {rivalStarter}이지! 최고의 선택이야!' },
+            { speaker: 'rival', emotion: 'normal', text: '음... 근데 너는 뭘 골랐어?' },
+            { speaker: 'player', text: '나는 {starterName}을(를)!' },
+            { speaker: 'rival', emotion: 'thinking', text: '흠... 나쁘지 않은 선택이네.' },
+            { speaker: 'rival', emotion: 'confident', text: '좋아! 우리 언젠가 꼭 배틀하자!' },
+            { speaker: 'rival', emotion: 'happy', text: '누가 더 강한지 진짜 대결로 확인해보는 거야!' },
+            { speaker: 'player', text: '좋아! 기대할게!' },
+            { speaker: 'rival', emotion: 'normal', text: '그때까지 열심히 훈련해둬! 약한 상대는 재미없으니까.' },
+            { speaker: 'rival', emotion: 'confident', text: '그럼 나 먼저 갈게! 나중에 보자!' },
+            { speaker: 'narrator', text: '민수는 씩씩하게 어디론가 뛰어갔다.' },
+            { speaker: 'player', text: '(웃으며) 정말 변함없네, 민수는.' }
         ],
         nextScene: null,
         action: { type: 'complete_chapter', value: 'chapter1' }
@@ -916,8 +952,11 @@ const STORY_SCENES = {
         id: 'first_battle_tutorial',
         location: 'route1',
         dialogues: [
-            { speaker: 'narrator', text: '풀숲에서 무언가 움직인다!' },
-            { speaker: 'player', text: '야생 몬스터다! 드디어 첫 배틀이야!' }
+            { speaker: 'narrator', text: '1번 도로의 풀숲을 지나가던 중...' },
+            { speaker: 'narrator', text: '갑자기 풀숲에서 무언가 움직인다!' },
+            { speaker: 'player', text: '잠깐, 저건...!' },
+            { speaker: 'player', text: '야생 몬스터다! 드디어 첫 배틀이야!' },
+            { speaker: 'player', text: '자, {starterName}! 우리의 첫 전투야!' }
         ],
         nextScene: null,
         action: { type: 'wild_battle', level: 3 }
@@ -927,7 +966,11 @@ const STORY_SCENES = {
         location: 'route1',
         dialogues: [
             { speaker: 'narrator', text: '1번 도로를 탐험하며 여러 몬스터를 만났다.' },
-            { speaker: 'player', text: '이제 좀 감이 잡히는 것 같아!' }
+            { speaker: 'player', text: '휴... 꽤 많은 몬스터들을 만났네.' },
+            { speaker: 'player', text: '{starterName}도 많이 강해진 것 같아!' },
+            { speaker: 'player', text: '이제 좀 감이 잡히는 것 같아. 배틀이 재밌어!' },
+            { speaker: 'narrator', text: '저 멀리 울창한 숲이 보인다...' },
+            { speaker: 'player', text: '저기 숲이 있네. 어떤 몬스터들이 있을까?' }
         ],
         nextScene: null,
         action: { type: 'unlock_location', value: 'forest_entrance' }
@@ -936,9 +979,12 @@ const STORY_SCENES = {
         id: 'enter_forest',
         location: 'forest_entrance',
         dialogues: [
-            { speaker: 'narrator', text: '숲의 입구에 도착했다. 나무들이 울창하다.' },
-            { speaker: 'player', text: '여기에는 어떤 몬스터들이 있을까...' },
-            { speaker: 'narrator', text: '갑자기 이상한 기운이 느껴진다...' }
+            { speaker: 'narrator', text: '숲의 입구에 도착했다. 울창한 나무들이 하늘을 가리고 있다.' },
+            { speaker: 'player', text: '와... 정말 크다. 숲 안이 어두워 보여.' },
+            { speaker: 'player', text: '여기에는 어떤 몬스터들이 살고 있을까...' },
+            { speaker: 'narrator', text: '바람이 불어오며 나뭇잎이 스산하게 흔들린다.' },
+            { speaker: 'player', text: '음? 뭔가 이상한 기운이 느껴지는데...' },
+            { speaker: 'player', text: '기분 탓인가? 조심해서 들어가봐야겠어.' }
         ],
         nextScene: null,
         action: { type: 'complete_chapter', value: 'chapter2' }
@@ -949,8 +995,10 @@ const STORY_SCENES = {
         id: 'forest_encounter',
         location: 'forest_deep',
         dialogues: [
-            { speaker: 'narrator', text: '숲 깊은 곳에서 수상한 그림자가 보인다...' },
-            { speaker: 'player', text: '거기 누구세요?' }
+            { speaker: 'narrator', text: '숲 깊은 곳으로 들어섰다. 빛이 거의 들지 않는다.' },
+            { speaker: 'player', text: '여기 정말 어둡다... {starterName}, 괜찮아?' },
+            { speaker: 'narrator', text: '갑자기 저쪽에서 검은 그림자가 움직인다.' },
+            { speaker: 'player', text: '...! 거기 누구세요?' }
         ],
         nextScene: 'meet_stranger'
     },
@@ -959,10 +1007,14 @@ const STORY_SCENES = {
         location: 'forest_deep',
         dialogues: [
             { speaker: 'stranger', emotion: 'mysterious', text: '...' },
-            { speaker: 'stranger', emotion: 'normal', text: '흥미롭군. 새로운 트레이너인가.' },
-            { speaker: 'player', text: '당신은 누구세요?' },
-            { speaker: 'stranger', emotion: 'mysterious', text: '이름은 중요하지 않아.' },
-            { speaker: 'stranger', emotion: 'serious', text: '다만... 곧 큰 일이 일어날 거야.' }
+            { speaker: 'player', text: '(긴장하며) 저기요...?' },
+            { speaker: 'stranger', emotion: 'normal', text: '...흥미롭군.' },
+            { speaker: 'stranger', emotion: 'mysterious', text: '새로운 트레이너인가. 그것도 꽤 어린.' },
+            { speaker: 'player', text: '당신은 누구세요? 왜 이런 곳에...' },
+            { speaker: 'stranger', emotion: 'serious', text: '이름 따위는 중요하지 않아.' },
+            { speaker: 'stranger', emotion: 'mysterious', text: '다만... 넌 알아야 해.' },
+            { speaker: 'player', text: '뭘요?' },
+            { speaker: 'stranger', emotion: 'serious', text: '이 세계에는... 곧 큰 변화가 찾아올 거야.' }
         ],
         nextScene: 'stranger_warning'
     },
@@ -970,11 +1022,20 @@ const STORY_SCENES = {
         id: 'stranger_warning',
         location: 'forest_deep',
         dialogues: [
+            { speaker: 'player', text: '큰 변화요? 무슨 말이에요?' },
             { speaker: 'stranger', emotion: 'serious', text: '마법의 공간... 그곳에서 무언가가 깨어나고 있어.' },
             { speaker: 'player', text: '마법의 공간이요? 그게 뭔데요?' },
-            { speaker: 'stranger', emotion: 'mysterious', text: '때가 되면 알게 될 거야...' },
-            { speaker: 'narrator', text: '수상한 사람은 그림자 속으로 사라졌다.' },
-            { speaker: 'player', text: '뭐지... 조금 무서운데...' }
+            { speaker: 'stranger', emotion: 'mysterious', text: '오래전부터 전해지는 이야기...' },
+            { speaker: 'stranger', emotion: 'serious', text: '현실과 다른 차원이 연결되는 곳이라고 하지.' },
+            { speaker: 'stranger', emotion: 'mysterious', text: '그 경계가... 흔들리고 있어.' },
+            { speaker: 'player', text: '그게 무슨...' },
+            { speaker: 'stranger', emotion: 'normal', text: '지금은 이해하지 못해도 괜찮아.' },
+            { speaker: 'stranger', emotion: 'serious', text: '다만, 네 몬스터를 소중히 여겨. 언젠가 그들의 힘이 필요할 테니.' },
+            { speaker: 'narrator', text: '수상한 사람은 그림자 속으로 조용히 사라졌다.' },
+            { speaker: 'player', text: '잠깐요...!' },
+            { speaker: 'narrator', text: '하지만 그 사람은 이미 보이지 않았다.' },
+            { speaker: 'player', text: '마법의 공간... 차원의 경계...' },
+            { speaker: 'player', text: '뭐지... 조금 무섭지만, 이상하게 신경이 쓰여.' }
         ],
         nextScene: null,
         action: { type: 'complete_chapter', value: 'chapter3' }
@@ -985,11 +1046,17 @@ const STORY_SCENES = {
         id: 'rival_challenge',
         location: 'lake_area',
         dialogues: [
+            { speaker: 'narrator', text: '신비의 호수에 도착했다. 맑은 물이 햇살에 반짝인다.' },
+            { speaker: 'player', text: '와... 여기 정말 예쁘다.' },
             { speaker: 'rival', emotion: 'confident', text: '{playerName}! 드디어 찾았다!' },
-            { speaker: 'player', text: '민수? 여기서 뭐해?' },
-            { speaker: 'rival', emotion: 'happy', text: '뭐긴 뭐야, 너랑 배틀하려고 왔지!' },
-            { speaker: 'rival', emotion: 'confident', text: '나도 몬스터들을 많이 키웠거든.' },
-            { speaker: 'rival', emotion: 'normal', text: '자, 준비됐어?' }
+            { speaker: 'player', text: '어? 민수? 여기서 뭐해?' },
+            { speaker: 'rival', emotion: 'happy', text: '뭐긴 뭐야! 너 찾아다녔어!' },
+            { speaker: 'rival', emotion: 'confident', text: '약속했잖아, 언젠가 배틀하자고!' },
+            { speaker: 'player', text: '설마... 지금?' },
+            { speaker: 'rival', emotion: 'happy', text: '당연하지! 나도 열심히 훈련했단 말야.' },
+            { speaker: 'rival', emotion: 'confident', text: '몬스터들도 많이 키웠고!' },
+            { speaker: 'rival', emotion: 'normal', text: '자, 준비됐어? 진지하게 갈 거야.' },
+            { speaker: 'player', text: '좋아! 받아줄게, 민수!' }
         ],
         nextScene: 'rival_battle',
         action: { type: 'rival_battle' }
@@ -1004,27 +1071,40 @@ const STORY_SCENES = {
         id: 'after_battle',
         location: 'lake_area',
         dialogues: [
-            { speaker: 'rival', emotion: 'sad', text: '으앙... 졌어...' },
-            { speaker: 'rival', emotion: 'normal', text: '역시 {playerName}은 대단해!' },
-            { speaker: 'rival', emotion: 'confident', text: '하지만 다음엔 내가 이길 거야!' },
-            { speaker: 'player', text: '다음에 또 하자, 민수!' },
-            { speaker: 'rival', emotion: 'happy', text: '물론이지! 더 강해져서 다시 올게!' },
-            { speaker: 'narrator', text: '민수와의 첫 번째 대결에서 승리했다!' }
+            { speaker: 'rival', emotion: 'sad', text: '으으... 졌어...' },
+            { speaker: 'player', text: '민수, 괜찮아?' },
+            { speaker: 'rival', emotion: 'normal', text: '(한숨) 분하다... 정말 분해!' },
+            { speaker: 'rival', emotion: 'thinking', text: '근데... 인정할 건 인정해야지.' },
+            { speaker: 'rival', emotion: 'normal', text: '역시 {playerName}은 대단해. 나보다 강했어.' },
+            { speaker: 'player', text: '민수도 정말 강해졌던걸? 힘들었어.' },
+            { speaker: 'rival', emotion: 'happy', text: '흥, 위로는 됐고!' },
+            { speaker: 'rival', emotion: 'confident', text: '다음엔 내가 이길 거야. 두고 봐!' },
+            { speaker: 'player', text: '다음에 또 하자, 민수! 언제든 환영이야.' },
+            { speaker: 'rival', emotion: 'happy', text: '당연하지! 더 강해져서 반드시 다시 올 거야!' },
+            { speaker: 'rival', emotion: 'normal', text: '그때까지... 너도 더 강해져 있어! 안녕!' },
+            { speaker: 'narrator', text: '민수는 어딘가로 달려갔다. 뒷모습이 의욕으로 가득 차 보인다.' },
+            { speaker: 'player', text: '(미소 지으며) 민수와의 첫 번째 대결... 이겼다!' },
+            { speaker: 'player', text: '{starterName}, 고마워. 덕분에 이길 수 있었어!' }
         ],
         nextScene: null,
         action: { type: 'complete_chapter', value: 'chapter4' }
     },
 
-    // 카페 대화
+    // 카페 대화 (첫 방문)
     cafe_chat: {
         id: 'cafe_chat',
         location: 'cafe',
         dialogues: [
-            { speaker: 'cafe_owner', emotion: 'happy', text: '어서와! 무엇을 도와줄까?' },
-            { speaker: 'player', text: '안녕하세요! 혹시 이 근처에 대해 아시는 게 있으세요?' },
-            { speaker: 'cafe_owner', emotion: 'normal', text: '이 근처엔 다양한 몬스터들이 있지.' },
-            { speaker: 'cafe_owner', emotion: 'worried', text: '특히 숲 깊은 곳은 조심해야 해.' },
-            { speaker: 'cafe_owner', emotion: 'happy', text: '피곤하면 언제든 쉬러 와!' }
+            { speaker: 'cafe_owner', emotion: 'happy', text: '어서와! 우리 카페에 온 걸 환영해!' },
+            { speaker: 'player', text: '안녕하세요!' },
+            { speaker: 'cafe_owner', emotion: 'normal', text: '처음 보는 얼굴이네. 새로운 트레이너구나?' },
+            { speaker: 'player', text: '네, 얼마 전에 첫 몬스터를 받았어요!' },
+            { speaker: 'cafe_owner', emotion: 'happy', text: '그렇구나! 축하해! 커피 한 잔 서비스야.' },
+            { speaker: 'player', text: '감사합니다!' },
+            { speaker: 'cafe_owner', emotion: 'normal', text: '이 근처에 대해 알려줄까? 이곳에서 오래 살았거든.' },
+            { speaker: 'cafe_owner', emotion: 'worried', text: '1번 도로는 초보자에게 적당해. 하지만 숲 깊은 곳은 조심해야 해.' },
+            { speaker: 'cafe_owner', emotion: 'normal', text: '희귀한 몬스터도 있지만, 위험할 수 있거든.' },
+            { speaker: 'cafe_owner', emotion: 'happy', text: '피곤하면 언제든 쉬러 와! 여행 이야기도 들려줘!' }
         ],
         nextScene: null
     }

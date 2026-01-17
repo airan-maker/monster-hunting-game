@@ -657,9 +657,34 @@ function showLocationScreen(locationId) {
 
 // NPC와 대화
 function talkToNpc(npcId) {
-    // 간호사인 경우 동적 대화 처리
+    // 동적 대화 처리 NPC들
     if (npcId === 'nurse') {
         showNurseDialogue();
+        return;
+    }
+
+    if (npcId === 'professor') {
+        showProfessorDialogue();
+        return;
+    }
+
+    if (npcId === 'mom') {
+        showMomDialogue();
+        return;
+    }
+
+    if (npcId === 'cafe_owner') {
+        showCafeOwnerDialogue();
+        return;
+    }
+
+    if (npcId === 'rival') {
+        showRivalDialogue();
+        return;
+    }
+
+    if (npcId === 'villager_old_man') {
+        showVillagerOldManDialogue();
         return;
     }
 
@@ -681,6 +706,335 @@ function talkToNpc(npcId) {
     // 대화가 없으면 간단한 인사
     const npc = NPCS[npcId];
     showQuickDialogue(npc.name, `안녕하세요, ${gameState.playerName}!`);
+}
+
+// 박사님 동적 대화
+function showProfessorDialogue() {
+    showScreen('story-dialogue-screen');
+
+    const speakerEl = document.getElementById('dialogue-speaker');
+    const textEl = document.getElementById('dialogue-text');
+    const portraitEl = document.getElementById('dialogue-portrait');
+    const choicesEl = document.getElementById('dialogue-choices');
+
+    speakerEl.textContent = '오크 박사';
+    speakerEl.style.display = 'block';
+    choicesEl.classList.add('hidden');
+
+    // 박사 이미지 설정
+    setNpcPortrait(portraitEl, 'professor', 'normal');
+
+    // 파티가 없으면 스타터 선택 씬으로
+    if (gameState.party.length === 0) {
+        // 스타터 선택 씬 재생
+        if (!storyState.completedScenes.includes('meet_professor')) {
+            playScene('meet_professor');
+            return;
+        }
+        textEl.textContent = `${gameState.playerName}, 어서 몬스터를 골라보렴! 세 마리가 널 기다리고 있단다.`;
+        showDialogueReturnHandler();
+        return;
+    }
+
+    // 파티가 있으면 다양한 조언 제공
+    const tips = getProfessorTips();
+    const randomTip = tips[Math.floor(Math.random() * tips.length)];
+
+    textEl.textContent = randomTip;
+    setNpcPortrait(portraitEl, 'professor', 'happy');
+    showDialogueReturnHandler();
+}
+
+// 박사님 팁 목록 생성
+function getProfessorTips() {
+    const tips = [];
+    const party = gameState.party;
+    const pokedexCount = Object.keys(gameState.pokedex).filter(k => gameState.pokedex[k].caught).length;
+    const totalMonsters = Object.keys(MONSTERS).length;
+
+    // 파티 상태에 따른 팁
+    if (party.length === 1) {
+        tips.push(`${gameState.playerName}! ${party[0].name}과(와) 사이가 좋아 보이는구나. 더 많은 몬스터를 포획해서 팀을 구성해보는 건 어떨까?`);
+    }
+
+    if (party.length >= 3) {
+        tips.push(`오, 벌써 ${party.length}마리나 모았구나! 다양한 속성의 몬스터로 팀을 구성하면 어떤 상대도 이길 수 있단다.`);
+    }
+
+    // 도감 진행도에 따른 팁
+    if (pokedexCount < 5) {
+        tips.push(`아직 도감에 ${pokedexCount}종류밖에 없구나. 1번 도로 풀숲에는 다양한 몬스터들이 있으니 탐험해보렴!`);
+    } else if (pokedexCount >= 10) {
+        tips.push(`대단해! 벌써 ${pokedexCount}종류나 발견했구나! 전체 ${totalMonsters}종류 중에서 정말 잘하고 있어.`);
+    }
+
+    // 파티 레벨에 따른 팁
+    const avgLevel = Math.floor(party.reduce((sum, m) => sum + m.level, 0) / party.length);
+    if (avgLevel >= 10) {
+        tips.push(`몬스터들이 많이 성장했구나! 평균 레벨이 ${avgLevel}이라니. 곧 진화할 수 있는 몬스터도 있을 거야.`);
+    }
+
+    // 속성 관련 팁
+    const types = [...new Set(party.map(m => MONSTERS[m.baseId]?.type))];
+    if (types.length === 1) {
+        tips.push(`팀이 전부 ${getTypeName(types[0])} 속성이구나. 상성을 고려해서 다른 속성 몬스터도 포획해보는 게 좋겠어!`);
+    }
+
+    // 일반 팁들
+    tips.push(`알고 있니? 불 속성은 풀에게 강하고, 풀은 물에게 강하고, 물은 불에게 강하단다. 상성을 잘 활용해봐!`);
+    tips.push(`몬스터들은 배틀을 통해 경험치를 얻고 성장한단다. 꾸준히 훈련시키는 게 중요해!`);
+    tips.push(`희귀한 몬스터일수록 포획하기 어렵단다. 먼저 HP를 낮추고 포획을 시도해봐!`);
+    tips.push(`숲 깊은 곳에는 희귀한 몬스터들이 있다는 소문이 있어. 하지만 조심해야 해!`);
+    tips.push(`몬스터가 지치면 몬스터 센터에서 치료받을 수 있단다. 간호사 조이가 잘 돌봐줄 거야!`);
+    tips.push(`진화하는 몬스터들은 특정 레벨에 도달하면 더 강해진단다. 기대해봐!`);
+
+    // 현재 위치에 따른 팁
+    if (storyState.unlockedLocations.includes('forest_entrance')) {
+        tips.push(`숲 입구를 발견했구나! 그곳에는 벌레 속성이나 풀 속성 몬스터가 많이 있단다.`);
+    }
+
+    if (storyState.unlockedLocations.includes('lake_area')) {
+        tips.push(`신비의 호수에서는 물 속성 몬스터를 많이 만날 수 있어. 드래곤 타입도 가끔 나타난다더군!`);
+    }
+
+    return tips;
+}
+
+// 엄마 동적 대화
+function showMomDialogue() {
+    showScreen('story-dialogue-screen');
+
+    const speakerEl = document.getElementById('dialogue-speaker');
+    const textEl = document.getElementById('dialogue-text');
+    const portraitEl = document.getElementById('dialogue-portrait');
+    const choicesEl = document.getElementById('dialogue-choices');
+
+    speakerEl.textContent = '엄마';
+    speakerEl.style.display = 'block';
+    choicesEl.classList.add('hidden');
+
+    setNpcPortrait(portraitEl, 'mom', 'normal');
+
+    const messages = getMomMessages();
+    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+
+    textEl.textContent = randomMsg;
+    showDialogueReturnHandler();
+}
+
+// 엄마 대사 목록
+function getMomMessages() {
+    const messages = [];
+    const party = gameState.party;
+
+    if (party.length === 0) {
+        messages.push(`${gameState.playerName}, 오크 박사님이 연구소에서 기다리고 계셔. 어서 가보렴!`);
+        messages.push(`첫 몬스터를 받으러 가는 거지? 정말 기대되는구나!`);
+    } else {
+        // 파티 상태에 따른 대사
+        const firstMonster = party[0];
+        messages.push(`${firstMonster.name}와(과) 사이좋게 지내고 있니? 파트너를 소중히 여기렴.`);
+        messages.push(`모험은 잘 되어가니? 힘들면 언제든 집에 와서 쉬어도 돼.`);
+        messages.push(`밖에서 조심해야 해! 그리고 밥은 잘 챙겨먹고?`);
+        messages.push(`${gameState.playerName}, 넌 훌륭한 트레이너가 될 거야. 엄마는 항상 응원해!`);
+
+        // HP가 낮은 몬스터가 있을 때
+        const injuredMonster = party.find(m => m.stats.hp < m.stats.maxHp * 0.5);
+        if (injuredMonster) {
+            messages.push(`어머, ${injuredMonster.name}이(가) 많이 지쳐 보이는구나. 몬스터 센터에 가보는 게 좋겠어.`);
+        }
+
+        // 파티가 많을 때
+        if (party.length >= 4) {
+            messages.push(`벌써 ${party.length}마리나 모았구나! 우리 ${gameState.playerName}이(가) 정말 대단해!`);
+        }
+    }
+
+    return messages;
+}
+
+// 카페 주인 동적 대화
+function showCafeOwnerDialogue() {
+    showScreen('story-dialogue-screen');
+
+    const speakerEl = document.getElementById('dialogue-speaker');
+    const textEl = document.getElementById('dialogue-text');
+    const portraitEl = document.getElementById('dialogue-portrait');
+    const choicesEl = document.getElementById('dialogue-choices');
+
+    speakerEl.textContent = '카페 주인';
+    speakerEl.style.display = 'block';
+    choicesEl.classList.add('hidden');
+
+    setNpcPortrait(portraitEl, 'cafe_owner', 'normal');
+
+    const messages = getCafeOwnerMessages();
+    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+
+    textEl.textContent = randomMsg;
+    showDialogueReturnHandler();
+}
+
+// 카페 주인 대사 목록
+function getCafeOwnerMessages() {
+    const messages = [];
+
+    messages.push(`어서와! 오늘도 맛있는 커피가 준비되어 있단다. 쉬었다 가렴!`);
+    messages.push(`요즘 숲에서 이상한 소리가 들린다는 소문이 있어. 조심해!`);
+    messages.push(`민수라는 아이가 아까 들렀더구나. 너랑 배틀하고 싶다고 했어.`);
+    messages.push(`1번 도로 풀숲에서 희귀한 몬스터를 봤다는 손님이 있었어. 운이 좋으면 만날 수 있을지도?`);
+
+    // 진행도에 따른 대사
+    if (storyState.unlockedLocations.includes('forest_deep')) {
+        messages.push(`숲 깊은 곳까지 갔었구나? 대단해! 거기에 수상한 사람이 있다던데...`);
+    }
+
+    if (storyState.unlockedLocations.includes('lake_area')) {
+        messages.push(`신비의 호수에 다녀왔니? 그곳은 정말 아름답지. 물 속성 몬스터들의 낙원이야.`);
+    }
+
+    if (storyState.completedChapters.includes('chapter3')) {
+        messages.push(`수상한 사람을 만났다고? 그 사람... 예전부터 가끔 마을에 나타나곤 했어. 뭔가 알고 있는 것 같기도 하고...`);
+    }
+
+    messages.push(`트레이너들 사이에서는 진화한 몬스터가 훨씬 강하다고 해. 레벨을 올려봐!`);
+    messages.push(`포션이 떨어지면 힘들지. 상점에서 미리미리 사두는 게 좋아!`);
+
+    return messages;
+}
+
+// 라이벌 동적 대화
+function showRivalDialogue() {
+    showScreen('story-dialogue-screen');
+
+    const speakerEl = document.getElementById('dialogue-speaker');
+    const textEl = document.getElementById('dialogue-text');
+    const portraitEl = document.getElementById('dialogue-portrait');
+    const choicesEl = document.getElementById('dialogue-choices');
+
+    speakerEl.textContent = '민수';
+    speakerEl.style.display = 'block';
+    choicesEl.classList.add('hidden');
+
+    setNpcPortrait(portraitEl, 'rival', 'normal');
+
+    const messages = getRivalMessages();
+    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+
+    textEl.textContent = randomMsg;
+    showDialogueReturnHandler();
+}
+
+// 라이벌 대사 목록
+function getRivalMessages() {
+    const messages = [];
+    const party = gameState.party;
+
+    if (party.length === 0) {
+        messages.push(`${gameState.playerName}! 아직 첫 몬스터 안 받았어? 나는 벌써 받았다고!`);
+        messages.push(`빨리 박사님한테 가봐! 늦으면 좋은 몬스터 다 뺏길지도 몰라~`);
+    } else {
+        messages.push(`오, ${party[0].name}을(를) 골랐구나? 나쁘지 않은 선택이야!`);
+        messages.push(`나도 열심히 훈련하고 있어. 다음에 만나면 배틀하자!`);
+        messages.push(`${gameState.playerName}, 너 실력 많이 늘었지? 다음엔 내가 이길 거야!`);
+        messages.push(`나는 지금 새로운 몬스터를 찾아다니는 중이야. 너도 열심히 해!`);
+
+        // 레벨에 따른 대사
+        const avgLevel = Math.floor(party.reduce((sum, m) => sum + m.level, 0) / party.length);
+        if (avgLevel >= 10) {
+            messages.push(`우와, 몬스터들이 많이 강해졌네! 나도 더 열심히 해야겠어!`);
+        }
+
+        // 챕터 진행에 따른 대사
+        if (storyState.completedChapters.includes('chapter4')) {
+            messages.push(`저번에 졌지만... 다음엔 절대 안 져! 기다려!`);
+        }
+    }
+
+    return messages;
+}
+
+// 마을 노인 동적 대화
+function showVillagerOldManDialogue() {
+    showScreen('story-dialogue-screen');
+
+    const speakerEl = document.getElementById('dialogue-speaker');
+    const textEl = document.getElementById('dialogue-text');
+    const portraitEl = document.getElementById('dialogue-portrait');
+    const choicesEl = document.getElementById('dialogue-choices');
+
+    speakerEl.textContent = '마을 노인';
+    speakerEl.style.display = 'block';
+    choicesEl.classList.add('hidden');
+
+    setNpcPortrait(portraitEl, 'villager_old_man', 'normal');
+
+    const messages = getVillagerOldManMessages();
+    const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+
+    textEl.textContent = randomMsg;
+    showDialogueReturnHandler();
+}
+
+// 마을 노인 대사 목록
+function getVillagerOldManMessages() {
+    const messages = [];
+
+    messages.push(`젊은이, 몬스터 여행은 재미있지? 나도 젊었을 때 많이 다녔단다.`);
+    messages.push(`이 마을은 평화롭지만, 숲 너머에는 위험한 곳도 있으니 조심하거라.`);
+    messages.push(`오크 박사님은 정말 대단한 분이야. 몬스터에 대해 모르는 게 없으시지.`);
+
+    // 진행도에 따른 대사
+    if (gameState.party.length > 0) {
+        messages.push(`오, 좋은 몬스터를 데리고 있구나! 잘 키우면 훌륭한 파트너가 될 거야.`);
+    }
+
+    if (storyState.unlockedLocations.includes('forest_entrance')) {
+        messages.push(`숲에 들어갔구나? 옛날에는 그 숲이 훨씬 더 깊었단다...`);
+    }
+
+    if (storyState.completedChapters.includes('chapter3')) {
+        messages.push(`수상한 사람? 아, 그 검은 망토를 입은 사람 말이지? 예전부터 가끔 보였어... 뭔가 아는 것 같기도 하고.`);
+    }
+
+    messages.push(`몬스터 센터는 언제나 열려 있으니, 지치면 쉬었다 가거라.`);
+    messages.push(`카페의 커피는 맛있단다. 한 잔 마시고 가렴.`);
+
+    return messages;
+}
+
+// NPC 초상화 설정 헬퍼 함수
+function setNpcPortrait(portraitEl, npcId, emotion) {
+    const emotionFile = emotion ? `_${emotion}` : '_normal';
+    const imagePath = `${IMAGE_PATHS.npcs}${npcId}${emotionFile}.png`;
+
+    portraitEl.style.backgroundImage = `url('${imagePath}')`;
+    portraitEl.textContent = '';
+    portraitEl.classList.remove('narrator');
+
+    // 이미지 로드 실패 시 이모지
+    const testImg = new Image();
+    testImg.onerror = () => {
+        portraitEl.style.backgroundImage = 'none';
+        portraitEl.textContent = NPC_EMOJIS[npcId] || '👤';
+        portraitEl.style.fontSize = '4rem';
+        portraitEl.style.display = 'flex';
+        portraitEl.style.justifyContent = 'center';
+        portraitEl.style.alignItems = 'center';
+    };
+    testImg.src = imagePath;
+}
+
+// 대화 후 돌아가기 핸들러 (범용)
+function showDialogueReturnHandler() {
+    setTimeout(() => {
+        const dialogueBox = document.querySelector('.dialogue-box');
+        const returnHandler = () => {
+            dialogueBox.removeEventListener('click', returnHandler);
+            showLocationScreen(storyState.currentLocation);
+        };
+        dialogueBox.addEventListener('click', returnHandler);
+    }, 100);
 }
 
 // 간호사 동적 대화
