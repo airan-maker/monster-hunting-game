@@ -12,7 +12,8 @@ monster-hunting-game/
 └── images/
     ├── npcs/           # NPC 캐릭터 이미지
     ├── locations/      # 배경 이미지
-    └── player/         # 플레이어 아바타
+    ├── player/         # 플레이어 아바타
+    └── icons/          # 맵 아이콘
 ```
 
 ---
@@ -79,7 +80,42 @@ monster-hunting-game/
 - 얼굴이 약간 가려진 느낌
 - 보라색이나 검은색 톤
 
-### 1.5 마을 사람들
+### 1.5 엄마
+| 파일명 | 표정 | 설명 |
+|--------|------|------|
+| `mom_normal.png` | 보통 | 기본 표정, 따뜻한 미소 |
+| `mom_happy.png` | 기쁨 | 환하게 웃는 표정 |
+| `mom_worried.png` | 걱정 | 걱정스러운 표정 |
+
+**캐릭터 설명**:
+- 30-40대 여성
+- 부드럽고 따뜻한 인상
+- 에이프런이나 편안한 복장
+- 갈색 또는 검은 머리
+
+### 1.6 간호사 조이
+| 파일명 | 표정 | 설명 |
+|--------|------|------|
+| `nurse_normal.png` | 보통 | 친절한 미소 |
+| `nurse_happy.png` | 기쁨 | 환하게 웃는 표정 |
+
+**캐릭터 설명**:
+- 20-30대 여성
+- 분홍색 또는 흰색 간호사 유니폼
+- 밝고 친절한 인상
+- 분홍색 또는 빨간색 머리 (포켓몬 스타일)
+
+### 1.7 상점 주인
+| 파일명 | 설명 |
+|--------|------|
+| `shop_owner.png` | 상점 주인, 친절한 상인 |
+
+**캐릭터 설명**:
+- 30-50대 남성 또는 여성
+- 상인 앞치마 착용
+- 친절하고 호기심 가득한 표정
+
+### 1.8 마을 사람들
 | 파일명 | 설명 |
 |--------|------|
 | `villager_old_man.png` | 노인 남성, 친절한 할아버지 |
@@ -87,7 +123,7 @@ monster-hunting-game/
 | `villager_boy.png` | 어린 남자아이, 호기심 많은 표정 |
 | `villager_girl.png` | 어린 여자아이, 밝은 표정 |
 
-### 1.6 트레이너들 (배틀용)
+### 1.9 트레이너들 (배틀용)
 | 파일명 | 설명 |
 |--------|------|
 | `trainer_youngster.png` | 젊은 남성 트레이너, 반바지 소년 |
@@ -158,7 +194,18 @@ monster-hunting-game/
 - 신비로운 분위기
 - 풀숲에서 몬스터가 나올 것 같은 느낌
 
-### 2.6 루트 (이동 경로)
+### 2.6 몬스터 센터
+| 파일명 | 설명 |
+|--------|------|
+| `location_pokemon_center.png` | 몬스터 센터 내부, 치료 기계와 카운터 |
+
+**장소 설명**:
+- 밝고 깨끗한 분위기
+- 분홍색/흰색 톤
+- 카운터에 간호사 조이가 있는 느낌
+- 몬스터 치료 기계가 보이는 구도
+
+### 2.7 루트 (이동 경로)
 | 파일명 | 설명 |
 |--------|------|
 | `location_route1.png` | 1번 도로, 풀밭과 길 |
@@ -168,6 +215,47 @@ monster-hunting-game/
 - 야생 몬스터가 나타날 것 같은 풀밭
 - 걸어갈 수 있는 흙길
 - 자연 풍경
+
+### 2.8 깊은 숲
+| 파일명 | 설명 |
+|--------|------|
+| `location_forest_deep.png` | 숲 깊은 곳, 울창한 나무와 어두운 분위기 |
+
+**장소 설명**:
+- 빛이 잘 들지 않는 어두운 숲
+- 신비로운 분위기
+- 나무 사이로 살짝 비치는 빛
+
+### 2.9 신비의 호수
+| 파일명 | 설명 |
+|--------|------|
+| `location_lake.png` | 호수 전경, 맑은 물과 풍경 |
+
+**장소 설명**:
+- 맑고 푸른 호수
+- 반짝이는 수면
+- 주변에 나무와 꽃들
+- 평화롭고 신비로운 분위기
+
+### 2.10 산기슭
+| 파일명 | 설명 |
+|--------|------|
+| `location_mountain_base.png` | 산 입구, 바위와 언덕 |
+
+**장소 설명**:
+- 험준한 바위 지형
+- 산으로 이어지는 길
+- 갈색/회색 톤의 자연
+
+### 2.11 동굴 입구
+| 파일명 | 설명 |
+|--------|------|
+| `location_cave_entrance.png` | 동굴 입구, 어두운 동굴 앞 |
+
+**장소 설명**:
+- 어둡고 신비로운 동굴 입구
+- 안쪽이 보이지 않는 어둠
+- 바위로 둘러싸인 입구
 
 ---
 
@@ -210,13 +298,15 @@ monster-hunting-game/
 | `map_icon_house.png` | 48x48 | 집 아이콘 |
 | `map_icon_lab.png` | 48x48 | 연구소 아이콘 |
 | `map_icon_cafe.png` | 48x48 | 카페 아이콘 |
+| `map_icon_pokecenter.png` | 48x48 | 몬스터 센터 아이콘 (분홍색 건물) |
 | `map_icon_forest.png` | 48x48 | 숲 아이콘 |
 | `map_icon_player.png` | 32x32 | 플레이어 위치 마커 |
-| `map_icon_town.png` | 48x48 | Hometown 아이콘 |
-| `map_icon_route.png` | 48x48 | 1번 도로 아이콘 |
+| `map_icon_town.png` | 48x48 | 시작 마을 아이콘 |
+| `map_icon_route.png` | 48x48 | 도로 아이콘 |
 | `map_icon_lake.png` | 48x48 | 호수 아이콘 |
 | `map_icon_mountain.png` | 48x48 | 산기슭 아이콘 |
-| `map_icon_cave.png` | 32x32 | 동굴 입구 마커 |
+| `map_icon_cave.png` | 48x48 | 동굴 입구 아이콘 |
+
 ---
 
 ## 5. 이미지 생성 팁
@@ -248,20 +338,58 @@ sunny day, peaceful atmosphere, illustrated style,
 ## 6. 이미지 체크리스트
 
 ### 필수 이미지 (최소 요구사항)
+
+#### NPC 캐릭터
 - [ ] `professor_normal.png`
 - [ ] `rival_normal.png`
 - [ ] `cafe_owner_normal.png`
 - [ ] `stranger_normal.png`
+- [ ] `mom_normal.png`
+- [ ] `nurse_normal.png`
+
+#### 장소 배경
 - [ ] `location_player_house_inside.png`
 - [ ] `location_hometown.png`
 - [ ] `location_lab_inside.png`
+- [ ] `location_pokemon_center.png`
+
+#### 플레이어
 - [ ] `player_boy.png` 또는 `player_girl.png`
 
 ### 권장 이미지 (게임 경험 향상)
-- [ ] 각 NPC의 추가 표정들
-- [ ] 모든 장소 배경
+
+#### NPC 추가 표정
+- [ ] `professor_happy.png`, `professor_thinking.png`, `professor_surprised.png`
+- [ ] `rival_happy.png`, `rival_confident.png`, `rival_surprised.png`, `rival_sad.png`
+- [ ] `cafe_owner_happy.png`, `cafe_owner_worried.png`
+- [ ] `stranger_mysterious.png`, `stranger_serious.png`
+- [ ] `mom_happy.png`, `mom_worried.png`
+- [ ] `nurse_happy.png`
+
+#### 추가 장소 배경
+- [ ] `location_cafe_inside.png`
+- [ ] `location_route1.png`
+- [ ] `location_forest_entrance.png`
+- [ ] `location_forest_deep.png`
+- [ ] `location_lake.png`
+- [ ] `location_mountain_base.png`
+- [ ] `location_cave_entrance.png`
+
+#### 맵 아이콘
+- [ ] `map_icon_house.png`
+- [ ] `map_icon_lab.png`
+- [ ] `map_icon_cafe.png`
+- [ ] `map_icon_pokecenter.png`
+- [ ] `map_icon_forest.png`
+- [ ] `map_icon_town.png`
+- [ ] `map_icon_route.png`
+- [ ] `map_icon_lake.png`
+- [ ] `map_icon_mountain.png`
+- [ ] `map_icon_cave.png`
+
+#### 플레이어 추가
 - [ ] 남/여 주인공 모두
-- [ ] 맵 아이콘들
+- [ ] `player_boy_icon.png`, `player_girl_icon.png`
 
 ---
 

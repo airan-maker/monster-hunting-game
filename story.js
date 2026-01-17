@@ -189,12 +189,30 @@ function setPortrait(speaker, emotion) {
             portraitEl.style.alignItems = 'center';
         };
     } else if (speaker === 'player') {
-        portraitEl.style.backgroundImage = 'none';
-        portraitEl.textContent = storyState.playerGender === 'boy' ? '👦' : '👧';
-        portraitEl.style.fontSize = '4rem';
-        portraitEl.style.display = 'flex';
-        portraitEl.style.justifyContent = 'center';
-        portraitEl.style.alignItems = 'center';
+        // 플레이어 이미지 사용
+        const playerImg = storyState.playerGender === 'boy' ? 'player_boy.png' : 'player_girl.png';
+        const img = new Image();
+        img.src = `${IMAGE_PATHS.player}${playerImg}`;
+
+        img.onload = () => {
+            portraitEl.style.backgroundImage = `url('${IMAGE_PATHS.player}${playerImg}')`;
+            portraitEl.textContent = '';
+            portraitEl.style.fontSize = '';
+        };
+
+        img.onerror = () => {
+            // 이미지 로드 실패 시 이모지 폴백
+            portraitEl.style.backgroundImage = 'none';
+            portraitEl.textContent = storyState.playerGender === 'boy' ? '👦' : '👧';
+            portraitEl.style.fontSize = '4rem';
+            portraitEl.style.display = 'flex';
+            portraitEl.style.justifyContent = 'center';
+            portraitEl.style.alignItems = 'center';
+        };
+
+        // 초기 설정 (이미지 로드 전)
+        portraitEl.style.backgroundImage = `url('${IMAGE_PATHS.player}${playerImg}')`;
+        portraitEl.textContent = '';
     } else {
         portraitEl.style.backgroundImage = 'none';
         portraitEl.textContent = NPC_EMOJIS[speaker] || '👤';
