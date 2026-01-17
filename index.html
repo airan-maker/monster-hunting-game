@@ -367,13 +367,30 @@
             <div class="screen-header">
                 <button class="back-btn" onclick="goBack()">← 뒤로</button>
                 <h2>🐾 내 파티</h2>
+                <button class="manage-btn" id="manage-monsters-btn" onclick="toggleManageMode()">🗑️ 관리</button>
             </div>
+            <p class="manage-hint hidden" id="manage-hint">버리고 싶은 몬스터를 선택하세요</p>
             <div class="party-grid" id="party-grid">
                 <!-- 파티 몬스터들이 동적으로 추가됨 -->
             </div>
             <h3>📦 보관함</h3>
             <div class="storage-grid" id="storage-grid">
                 <!-- 보관함 몬스터들이 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 몬스터 버리기 확인 모달 -->
+        <div id="release-modal" class="modal hidden">
+            <div class="modal-content release-modal-content">
+                <h3>⚠️ 몬스터 놓아주기</h3>
+                <div class="release-monster-info" id="release-monster-info">
+                    <!-- 몬스터 정보가 동적으로 추가됨 -->
+                </div>
+                <p class="release-warning">정말로 이 몬스터를 놓아주시겠습니까?<br>놓아준 몬스터는 되돌릴 수 없습니다!</p>
+                <div class="modal-buttons">
+                    <button class="cancel-btn" onclick="hideReleaseModal()">취소</button>
+                    <button class="confirm-btn danger" onclick="confirmRelease()">놓아주기</button>
+                </div>
             </div>
         </div>
 

@@ -1615,6 +1615,10 @@ function showMonsterDetail(monsterId) {
 }
 
 // 파티 렌더링
+// 관리 모드 상태
+let manageMode = false;
+let releaseTarget = null; // { type: 'party' | 'storage', index: number }
+
 function renderParty() {
     const partyGrid = document.getElementById('party-grid');
     const storageGrid = document.getElementById('storage-grid');
@@ -1626,9 +1630,11 @@ function renderParty() {
         if (monster) {
             const base = MONSTERS[monster.baseId];
             const canEvolve = base.evolvesTo && monster.level >= base.evolveLevel;
+            const clickHandler = manageMode ? `selectForRelease('party', ${i})` : `showPartyMonsterDetail(${i})`;
 
             partyGrid.innerHTML += `
-                <div class="party-slot ${canEvolve ? 'evolving' : ''}" onclick="showPartyMonsterDetail(${i})">
+                <div class="party-slot ${canEvolve ? 'evolving' : ''} ${manageMode ? 'manage-mode' : ''}" onclick="${clickHandler}">
+                    ${manageMode ? '<span class="release-icon">❌</span>' : ''}
                     <span class="sprite">${monster.emoji}</span>
                     <div class="info">
                         <span class="name">${monster.name}</span>
@@ -1645,12 +1651,98 @@ function renderParty() {
     }
 
     // 보관함
-    storageGrid.innerHTML = gameState.storage.map((monster, i) => `
-        <div class="storage-slot" onclick="moveToParty(${i})">
-            <span class="sprite">${monster.emoji}</span>
-            <span class="level">Lv.${monster.level}</span>
+    if (gameState.storage.length === 0) {
+        storageGrid.innerHTML = '<p style="color: #888; grid-column: span 4; text-align: center;">보관함이 비어있습니다.</p>';
+    } else {
+        storageGrid.innerHTML = gameState.storage.map((monster, i) => {
+            const clickHandler = manageMode ? `selectForRelease('storage', ${i})` : `moveToParty(${i})`;
+            return `
+                <div class="storage-slot ${manageMode ? 'manage-mode' : ''}" onclick="${clickHandler}">
+                    ${manageMode ? '<span class="release-icon">❌</span>' : ''}
+                    <span class="sprite">${monster.emoji}</span>
+                    <span class="level">Lv.${monster.level}</span>
+                </div>
+            `;
+        }).join('');
+    }
+}
+
+// 관리 모드 토글
+function toggleManageMode() {
+    manageMode = !manageMode;
+    const btn = document.getElementById('manage-monsters-btn');
+    const hint = document.getElementById('manage-hint');
+
+    if (manageMode) {
+        btn.textContent = '✓ 완료';
+        btn.classList.add('active');
+        hint.classList.remove('hidden');
+    } else {
+        btn.textContent = '🗑️ 관리';
+        btn.classList.remove('active');
+        hint.classList.add('hidden');
+    }
+
+    renderParty();
+}
+
+// 몬스터 놓아주기 선택
+function selectForRelease(type, index) {
+    const monster = type === 'party' ? gameState.party[index] : gameState.storage[index];
+    if (!monster) return;
+
+    // 파티에 1마리만 남은 경우 놓아줄 수 없음
+    if (type === 'party' && gameState.party.length <= 1) {
+        showMessage('최소 1마리의 몬스터는 파티에 남아있어야 합니다!');
+        return;
+    }
+
+    releaseTarget = { type, index };
+    showReleaseModal(monster);
+}
+
+// 놓아주기 모달 표시
+function showReleaseModal(monster) {
+    const modal = document.getElementById('release-modal');
+    const info = document.getElementById('release-monster-info');
+
+    info.innerHTML = `
+        <div class="release-monster-preview">
+            <span class="monster-emoji">${monster.emoji}</span>
+            <div class="monster-details">
+                <span class="monster-name">${monster.name}</span>
+                <span class="monster-level">Lv. ${monster.level}</span>
+            </div>
         </div>
-    `).join('') || '<p style="color: #888; grid-column: span 4; text-align: center;">보관함이 비어있습니다.</p>';
+    `;
+
+    modal.classList.remove('hidden');
+}
+
+// 놓아주기 모달 숨기기
+function hideReleaseModal() {
+    document.getElementById('release-modal').classList.add('hidden');
+    releaseTarget = null;
+}
+
+// 놓아주기 확정
+function confirmRelease() {
+    if (!releaseTarget) return;
+
+    const { type, index } = releaseTarget;
+    let monster;
+
+    if (type === 'party') {
+        monster = gameState.party.splice(index, 1)[0];
+    } else {
+        monster = gameState.storage.splice(index, 1)[0];
+    }
+
+    hideReleaseModal();
+    saveGame();
+    renderParty();
+
+    showMessage(`${monster.name}(을)를 놓아주었습니다. 안녕히...`);
 }
 
 // 보관함에서 파티로 이동
