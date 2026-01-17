@@ -155,15 +155,22 @@
             <div class="top-bar">
                 <div class="player-info">
                     <span id="player-name">트레이너</span>
+                    <span class="player-level-badge" id="explore-player-level">Lv.1</span>
                     <span id="player-balls">🔴 x <span id="ball-count">10</span></span>
                 </div>
                 <button class="menu-btn" onclick="showScreen('main-menu')">메뉴</button>
             </div>
             <h2>🗺️ 탐험할 지역을 선택하세요</h2>
+            <div class="auto-battle-toggle">
+                <button id="auto-battle-btn" class="auto-battle-btn" onclick="toggleAutoBattle()">
+                    🤖 자동 전투: <span id="auto-battle-status">OFF</span>
+                </button>
+            </div>
             <div class="region-grid" id="region-grid">
                 <!-- 지역들이 동적으로 추가됨 -->
             </div>
             <div class="bottom-nav">
+                <button onclick="showMyPage()">👤 MY</button>
                 <button onclick="showScreen('party-screen')">🐾 파티</button>
                 <button onclick="showScreen('pokedex-screen')">📖 도감</button>
                 <button onclick="showScreen('bag-screen')">🎒 가방</button>
@@ -253,6 +260,97 @@
             </div>
             <div class="pokedex-grid" id="pokedex-grid">
                 <!-- 도감 항목들이 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 마이페이지 화면 -->
+        <div id="mypage-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="goBack()">← 뒤로</button>
+                <h2>👤 마이페이지</h2>
+            </div>
+            <div class="mypage-content">
+                <!-- 프로필 카드 -->
+                <div class="profile-card">
+                    <div class="profile-avatar" id="profile-avatar">👦</div>
+                    <div class="profile-info">
+                        <h3 id="profile-name">트레이너</h3>
+                        <div class="profile-level">
+                            <span class="level-badge" id="profile-level">Lv. 1</span>
+                            <span class="level-title" id="profile-title">초보 트레이너</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 경험치 바 -->
+                <div class="player-exp-section">
+                    <div class="exp-label">
+                        <span>경험치</span>
+                        <span id="profile-exp-text">0 / 100</span>
+                    </div>
+                    <div class="player-exp-bar">
+                        <div class="player-exp-fill" id="profile-exp-bar"></div>
+                    </div>
+                    <p class="exp-hint" id="profile-exp-hint">다음 레벨까지 100 EXP 필요</p>
+                </div>
+
+                <!-- 통계 카드 -->
+                <div class="stats-section">
+                    <h4>📊 활동 기록</h4>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">⚔️</div>
+                            <div class="stat-value" id="stat-battles">0</div>
+                            <div class="stat-label">총 배틀</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-value" id="stat-wins">0</div>
+                            <div class="stat-label">승리</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔴</div>
+                            <div class="stat-value" id="stat-captures">0</div>
+                            <div class="stat-label">포획</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📖</div>
+                            <div class="stat-value" id="stat-pokedex">0</div>
+                            <div class="stat-label">도감</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 파티 미리보기 -->
+                <div class="party-preview-section">
+                    <h4>🐾 나의 파티</h4>
+                    <div class="party-preview" id="party-preview">
+                        <!-- 파티 몬스터들이 동적으로 추가됨 -->
+                    </div>
+                </div>
+
+                <!-- 보유 자원 -->
+                <div class="resources-section">
+                    <h4>💰 보유 자원</h4>
+                    <div class="resources-grid">
+                        <div class="resource-item">
+                            <span class="resource-icon">💰</span>
+                            <span class="resource-value" id="resource-money">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-icon">🔴</span>
+                            <span class="resource-value" id="resource-pokeball">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-icon">🔵</span>
+                            <span class="resource-value" id="resource-greatball">0</span>
+                        </div>
+                        <div class="resource-item">
+                            <span class="resource-icon">💛</span>
+                            <span class="resource-value" id="resource-ultraball">0</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 

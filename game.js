@@ -1,6 +1,12 @@
 // 게임 상태
 let gameState = {
     playerName: '트레이너',
+    playerGender: 'boy',
+    playerLevel: 1,
+    playerExp: 0,
+    totalBattles: 0,
+    totalCaptures: 0,
+    totalWins: 0,
     party: [],        // 파티 몬스터 (최대 6마리)
     storage: [],      // 보관함
     pokedex: {},      // 도감 (discovered/caught)
@@ -13,6 +19,15 @@ let gameState = {
     },
     money: 1000,
     currentRegion: null
+};
+
+// 자동 전투 상태
+let autoBattleState = {
+    isActive: false,
+    isPaused: false,
+    battleCount: 0,
+    captureAttempts: true,
+    autoHeal: true
 };
 
 // 배틀 상태
@@ -409,6 +424,12 @@ function startBattle(wildMonster) {
         maxSwitches: 6
     };
 
+    // 총 배틀 수 증가
+    gameState.totalBattles = (gameState.totalBattles || 0) + 1;
+
+    // 자동 전투 일시정지 해제
+    autoBattleState.isPaused = false;
+
     // 배경 이미지 설정
     const battleScreen = document.getElementById('battle-screen');
     const bgPath = getBackgroundImagePath(gameState.currentRegion);
@@ -431,6 +452,11 @@ function startBattle(wildMonster) {
     document.getElementById('battle-menu').classList.remove('hidden');
     document.getElementById('skill-menu').classList.add('hidden');
     document.getElementById('switch-menu').classList.add('hidden');
+
+    // 자동 전투 활성화시 자동 전투 시작
+    if (autoBattleState.isActive) {
+        setTimeout(() => startAutoBattle(), 1000);
+    }
 }
 
 // 교체 메뉴 표시
@@ -624,6 +650,11 @@ async function useSkill(skillId) {
 
     // 적 턴
     await enemyTurn();
+
+    // 자동 전투 계속
+    if (autoBattleState.isActive && !autoBattleState.isPaused && !battleState.battleEnded) {
+        runAutoBattleTurn();
+    }
 }
 
 // 공격 이펙트 표시
@@ -853,11 +884,18 @@ async function handleWildMonsterFaint() {
     battleState.battleEnded = true;
     const wild = battleState.wildMonster;
 
+    // 승리 횟수 증가
+    gameState.totalWins = (gameState.totalWins || 0) + 1;
+
     showBattleMessage(`야생의 ${wild.name}(을)를 쓰러뜨렸다!`);
     await delay(1500);
 
-    // 경험치 획득
+    // 몬스터 경험치 획득
     const expGain = Math.floor(wild.level * 20 * (RARITY_WEIGHTS.common / RARITY_WEIGHTS[wild.rarity]));
+
+    // 플레이어 경험치 획득 (몬스터 경험치의 일부)
+    const playerExpGain = Math.floor(expGain * 0.3) + wild.level;
+    gainPlayerExp(playerExpGain);
 
     // 경험치 획득 메시지
     showBattleMessage(`${expGain} 경험치를 획득했다!`);
@@ -1036,6 +1074,13 @@ async function tryCapture() {
 
         battleState.battleEnded = true;
 
+        // 포획 횟수 증가
+        gameState.totalCaptures = (gameState.totalCaptures || 0) + 1;
+
+        // 플레이어 경험치 획득 (포획 보너스)
+        const captureExpBonus = wild.level * 10 + (RARITY_WEIGHTS.common / RARITY_WEIGHTS[wild.rarity]) * 5;
+        gainPlayerExp(Math.floor(captureExpBonus));
+
         // 도감에 포획 기록
         gameState.pokedex[wild.baseId].caught = true;
 
@@ -1089,6 +1134,9 @@ function showBag() {
 
 // 결과 화면 표시
 function showResult(title, message, isVictory) {
+    // 자동 전투 오버레이 제거
+    removeAutoBattleOverlay();
+
     document.getElementById('result-title').textContent = title;
     document.getElementById('result-message').textContent = message;
 
@@ -1098,12 +1146,39 @@ function showResult(title, message, isVictory) {
     existingButtons.forEach(btn => btn.remove());
 
     if (isVictory) {
-        // 승리 시 확인 버튼
-        const confirmBtn = document.createElement('button');
-        confirmBtn.textContent = '확인';
-        confirmBtn.onclick = returnToExplore;
-        resultContent.appendChild(confirmBtn);
+        // 자동 전투 활성화 상태이고 탐험 모드면 자동으로 다음 전투
+        if (autoBattleState.isActive && !autoBattleState.isPaused && !storyState?.isStoryMode) {
+            const autoContinueBtn = document.createElement('button');
+            autoContinueBtn.textContent = '⏸️ 자동 전투 중지';
+            autoContinueBtn.onclick = () => {
+                autoBattleState.isActive = false;
+                document.getElementById('auto-battle-btn').classList.remove('active');
+                document.getElementById('auto-battle-status').textContent = 'OFF';
+                returnToExplore();
+            };
+            resultContent.appendChild(autoContinueBtn);
+
+            // 2초 후 자동으로 다음 전투
+            setTimeout(() => {
+                if (autoBattleState.isActive && !autoBattleState.isPaused) {
+                    autoBattleNextEncounter();
+                }
+            }, 2000);
+        } else {
+            // 수동 모드 - 확인 버튼
+            const confirmBtn = document.createElement('button');
+            confirmBtn.textContent = '확인';
+            confirmBtn.onclick = returnToExplore;
+            resultContent.appendChild(confirmBtn);
+        }
     } else {
+        // 패배 시 자동 전투 중지
+        autoBattleState.isActive = false;
+        const autoBattleBtn = document.getElementById('auto-battle-btn');
+        const autoBattleStatus = document.getElementById('auto-battle-status');
+        if (autoBattleBtn) autoBattleBtn.classList.remove('active');
+        if (autoBattleStatus) autoBattleStatus.textContent = 'OFF';
+
         // 패배 시 몬스터 센터로 이동 버튼
         if (storyState && storyState.isStoryMode) {
             const healBtn = document.createElement('button');
@@ -1361,10 +1436,312 @@ function loadGame() {
     if (saved) {
         try {
             gameState = JSON.parse(saved);
+            // 새로운 필드 기본값 설정
+            if (gameState.playerLevel === undefined) gameState.playerLevel = 1;
+            if (gameState.playerExp === undefined) gameState.playerExp = 0;
+            if (gameState.totalBattles === undefined) gameState.totalBattles = 0;
+            if (gameState.totalCaptures === undefined) gameState.totalCaptures = 0;
+            if (gameState.totalWins === undefined) gameState.totalWins = 0;
+            if (gameState.playerGender === undefined) gameState.playerGender = 'boy';
         } catch (e) {
             console.error('Failed to load save:', e);
         }
     }
+}
+
+// ==================== 플레이어 레벨 시스템 ====================
+
+// 레벨별 필요 경험치 계산
+function getExpForLevel(level) {
+    return Math.floor(100 * Math.pow(1.5, level - 1));
+}
+
+// 플레이어 경험치 획득
+function gainPlayerExp(amount) {
+    gameState.playerExp += amount;
+
+    // 레벨업 체크
+    while (gameState.playerExp >= getExpForLevel(gameState.playerLevel)) {
+        gameState.playerExp -= getExpForLevel(gameState.playerLevel);
+        gameState.playerLevel++;
+        showPlayerLevelUp();
+    }
+
+    saveGame();
+    updatePlayerLevelUI();
+}
+
+// 플레이어 레벨업 표시
+function showPlayerLevelUp() {
+    const levelUpMsg = document.createElement('div');
+    levelUpMsg.className = 'player-levelup-notification';
+    levelUpMsg.innerHTML = `
+        <div class="levelup-content">
+            <span class="levelup-icon">⭐</span>
+            <span class="levelup-text">트레이너 레벨 UP!</span>
+            <span class="levelup-level">Lv. ${gameState.playerLevel}</span>
+        </div>
+    `;
+    document.body.appendChild(levelUpMsg);
+
+    setTimeout(() => levelUpMsg.remove(), 3000);
+}
+
+// 플레이어 레벨 UI 업데이트
+function updatePlayerLevelUI() {
+    const exploreLevelEl = document.getElementById('explore-player-level');
+    if (exploreLevelEl) {
+        exploreLevelEl.textContent = `Lv.${gameState.playerLevel}`;
+    }
+}
+
+// 트레이너 타이틀 가져오기
+function getTrainerTitle(level) {
+    if (level < 5) return '초보 트레이너';
+    if (level < 10) return '견습 트레이너';
+    if (level < 20) return '숙련 트레이너';
+    if (level < 30) return '베테랑 트레이너';
+    if (level < 50) return '엘리트 트레이너';
+    if (level < 75) return '마스터 트레이너';
+    return '전설의 트레이너';
+}
+
+// ==================== 마이페이지 ====================
+
+// 마이페이지 표시
+function showMyPage() {
+    showScreen('mypage-screen');
+    updateMyPage();
+}
+
+// 마이페이지 업데이트
+function updateMyPage() {
+    // 프로필 아바타
+    const avatarEl = document.getElementById('profile-avatar');
+    const gender = gameState.playerGender || 'boy';
+    const avatarImg = `images/player/player_${gender}_icon.png`;
+    avatarEl.innerHTML = `<img src="${avatarImg}" alt="프로필" onerror="this.parentElement.innerHTML='${gender === 'boy' ? '👦' : '👧'}'">`;
+
+    // 이름과 레벨
+    document.getElementById('profile-name').textContent = gameState.playerName;
+    document.getElementById('profile-level').textContent = `Lv. ${gameState.playerLevel}`;
+    document.getElementById('profile-title').textContent = getTrainerTitle(gameState.playerLevel);
+
+    // 경험치 바
+    const currentExp = gameState.playerExp;
+    const neededExp = getExpForLevel(gameState.playerLevel);
+    const expPercent = (currentExp / neededExp) * 100;
+
+    document.getElementById('profile-exp-text').textContent = `${currentExp} / ${neededExp}`;
+    document.getElementById('profile-exp-bar').style.width = `${expPercent}%`;
+    document.getElementById('profile-exp-hint').textContent = `다음 레벨까지 ${neededExp - currentExp} EXP 필요`;
+
+    // 통계
+    document.getElementById('stat-battles').textContent = gameState.totalBattles || 0;
+    document.getElementById('stat-wins').textContent = gameState.totalWins || 0;
+    document.getElementById('stat-captures').textContent = gameState.totalCaptures || 0;
+
+    const pokedexCount = Object.keys(gameState.pokedex).filter(k => gameState.pokedex[k].caught).length;
+    document.getElementById('stat-pokedex').textContent = pokedexCount;
+
+    // 파티 미리보기
+    const partyPreview = document.getElementById('party-preview');
+    partyPreview.innerHTML = '';
+
+    for (let i = 0; i < 6; i++) {
+        if (i < gameState.party.length) {
+            const monster = gameState.party[i];
+            const monsterData = MONSTERS[monster.baseId];
+            const item = document.createElement('div');
+            item.className = 'party-preview-item';
+            item.innerHTML = `
+                <span class="monster-icon">${monsterData?.emoji || '❓'}</span>
+                <span class="monster-level">Lv.${monster.level}</span>
+            `;
+            partyPreview.appendChild(item);
+        } else {
+            const empty = document.createElement('div');
+            empty.className = 'party-preview-empty';
+            empty.textContent = '+';
+            partyPreview.appendChild(empty);
+        }
+    }
+
+    // 보유 자원
+    document.getElementById('resource-money').textContent = gameState.money || 0;
+    document.getElementById('resource-pokeball').textContent = gameState.items.pokeball || 0;
+    document.getElementById('resource-greatball').textContent = gameState.items.greatball || 0;
+    document.getElementById('resource-ultraball').textContent = gameState.items.ultraball || 0;
+}
+
+// ==================== 자동 전투 시스템 ====================
+
+// 자동 전투 토글
+function toggleAutoBattle() {
+    autoBattleState.isActive = !autoBattleState.isActive;
+
+    const btn = document.getElementById('auto-battle-btn');
+    const statusEl = document.getElementById('auto-battle-status');
+
+    if (autoBattleState.isActive) {
+        btn.classList.add('active');
+        statusEl.textContent = 'ON';
+        autoBattleState.battleCount = 0;
+    } else {
+        btn.classList.remove('active');
+        statusEl.textContent = 'OFF';
+        stopAutoBattle();
+    }
+}
+
+// 자동 전투 시작
+function startAutoBattle() {
+    if (!autoBattleState.isActive) return;
+
+    // 배틀 화면에 자동 전투 표시 추가
+    addAutoBattleOverlay();
+
+    // 자동 전투 로직 실행
+    runAutoBattleTurn();
+}
+
+// 자동 전투 오버레이 추가
+function addAutoBattleOverlay() {
+    let overlay = document.querySelector('.auto-battle-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'auto-battle-overlay';
+        overlay.innerHTML = `
+            <div class="spinner"></div>
+            <span>자동 전투 중...</span>
+        `;
+        document.getElementById('battle-screen').appendChild(overlay);
+    }
+
+    // 일시정지 버튼 추가
+    let pauseBtn = document.querySelector('.auto-battle-pause-btn');
+    if (!pauseBtn) {
+        pauseBtn = document.createElement('button');
+        pauseBtn.className = 'auto-battle-pause-btn';
+        pauseBtn.textContent = '⏸️ 수동 전투로 전환';
+        pauseBtn.onclick = stopAutoBattle;
+        document.getElementById('battle-screen').appendChild(pauseBtn);
+    }
+}
+
+// 자동 전투 오버레이 제거
+function removeAutoBattleOverlay() {
+    const overlay = document.querySelector('.auto-battle-overlay');
+    const pauseBtn = document.querySelector('.auto-battle-pause-btn');
+    if (overlay) overlay.remove();
+    if (pauseBtn) pauseBtn.remove();
+}
+
+// 자동 전투 중지
+function stopAutoBattle() {
+    autoBattleState.isPaused = true;
+    removeAutoBattleOverlay();
+}
+
+// 자동 전투 턴 실행
+async function runAutoBattleTurn() {
+    if (!autoBattleState.isActive || autoBattleState.isPaused || battleState.battleEnded) {
+        removeAutoBattleOverlay();
+        return;
+    }
+
+    await delay(800); // 자동 전투 속도 조절
+
+    if (battleState.battleEnded) {
+        removeAutoBattleOverlay();
+        return;
+    }
+
+    if (!battleState.isPlayerTurn) {
+        // 적 턴 대기
+        await delay(500);
+        runAutoBattleTurn();
+        return;
+    }
+
+    // 포획 시도 (희귀 몬스터이고 HP가 낮을 때)
+    const wildMonster = battleState.wildMonster;
+    if (wildMonster && autoBattleState.captureAttempts) {
+        const hpPercent = (wildMonster.stats.hp / wildMonster.stats.maxHp) * 100;
+        const monsterData = MONSTERS[wildMonster.baseId];
+
+        // 희귀도가 높거나 HP가 낮으면 포획 시도
+        if (hpPercent <= 30 && monsterData && (monsterData.rarity === 'rare' || monsterData.rarity === 'epic' || monsterData.rarity === 'legendary')) {
+            if (gameState.items.pokeball > 0 || gameState.items.greatball > 0 || gameState.items.ultraball > 0) {
+                tryCapture();
+                return;
+            }
+        }
+    }
+
+    // 가장 강한 스킬 선택
+    const playerMonster = battleState.playerMonster;
+    if (playerMonster && playerMonster.skills && playerMonster.skills.length > 0) {
+        // 데미지가 가장 높은 스킬 선택
+        let bestSkill = playerMonster.skills[0];
+        let bestDamage = 0;
+
+        playerMonster.skills.forEach(skillId => {
+            const skill = SKILLS[skillId];
+            if (skill && skill.power > bestDamage) {
+                bestDamage = skill.power;
+                bestSkill = skillId;
+            }
+        });
+
+        useSkill(bestSkill);
+    } else {
+        // 스킬이 없으면 기본 공격
+        useSkill('tackle');
+    }
+}
+
+// 자동 전투 후 다음 배틀 시작
+function autoBattleNextEncounter() {
+    if (!autoBattleState.isActive || autoBattleState.isPaused) return;
+
+    autoBattleState.battleCount++;
+
+    // 파티 HP 체크 - 자동 힐
+    if (autoBattleState.autoHeal) {
+        let needHeal = false;
+        gameState.party.forEach(monster => {
+            if (monster.stats.hp < monster.stats.maxHp * 0.3) {
+                needHeal = true;
+            }
+        });
+
+        if (needHeal && gameState.items.potion > 0) {
+            // 자동 포션 사용
+            gameState.party.forEach(monster => {
+                if (monster.stats.hp < monster.stats.maxHp * 0.5 && gameState.items.potion > 0) {
+                    monster.stats.hp = Math.min(monster.stats.maxHp, monster.stats.hp + 20);
+                    gameState.items.potion--;
+                }
+            });
+        }
+
+        // 파티가 너무 약하면 자동 전투 중지
+        const allFainted = gameState.party.every(m => m.stats.hp <= 0);
+        if (allFainted) {
+            autoBattleState.isActive = false;
+            document.getElementById('auto-battle-btn').classList.remove('active');
+            document.getElementById('auto-battle-status').textContent = 'OFF';
+            return;
+        }
+    }
+
+    // 다음 전투 시작 (1초 후)
+    setTimeout(() => {
+        if (autoBattleState.isActive && !autoBattleState.isPaused) {
+            startBattle(gameState.currentRegion);
+        }
+    }, 1000);
 }
 
 // 게임 시작

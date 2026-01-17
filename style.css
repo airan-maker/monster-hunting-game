@@ -1852,3 +1852,390 @@ h3 {
         height: 120px;
     }
 }
+
+/* ==================== 마이페이지 스타일 ==================== */
+#mypage-screen {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.mypage-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-bottom: 20px;
+}
+
+/* 프로필 카드 */
+.profile-card {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+
+.profile-avatar {
+    width: 80px;
+    height: 80px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-info h3 {
+    color: white;
+    font-size: 1.4rem;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.profile-level {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.level-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 0.9rem;
+}
+
+.level-title {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.85rem;
+}
+
+/* 경험치 바 섹션 */
+.player-exp-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.exp-label {
+    display: flex;
+    justify-content: space-between;
+    color: #aaa;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+}
+
+.player-exp-bar {
+    width: 100%;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.player-exp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+    border-radius: 6px;
+    transition: width 0.5s ease;
+}
+
+.exp-hint {
+    color: #666;
+    font-size: 0.75rem;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* 통계 섹션 */
+.stats-section, .party-preview-section, .resources-section {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.stats-section h4, .party-preview-section h4, .resources-section h4 {
+    color: white;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 12px 8px;
+    text-align: center;
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+}
+
+.stat-value {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.stat-label {
+    color: #888;
+    font-size: 0.7rem;
+}
+
+/* 파티 미리보기 */
+.party-preview {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.party-preview-item {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.party-preview-item .monster-icon {
+    font-size: 1.8rem;
+}
+
+.party-preview-item .monster-level {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    font-size: 0.6rem;
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+
+.party-preview-empty {
+    width: 60px;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 2px dashed rgba(255, 255, 255, 0.2);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #444;
+}
+
+/* 보유 자원 */
+.resources-grid {
+    display: flex;
+    justify-content: space-around;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.08);
+    padding: 8px 14px;
+    border-radius: 8px;
+}
+
+.resource-icon {
+    font-size: 1.2rem;
+}
+
+.resource-value {
+    color: white;
+    font-weight: bold;
+}
+
+/* ==================== 자동 전투 스타일 ==================== */
+.auto-battle-toggle {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+
+.auto-battle-btn {
+    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.auto-battle-btn:hover {
+    transform: scale(1.05);
+}
+
+.auto-battle-btn.active {
+    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+    box-shadow: 0 4px 15px rgba(0, 206, 201, 0.4);
+}
+
+.auto-battle-btn.active #auto-battle-status {
+    color: #fff;
+    font-weight: bold;
+}
+
+/* 탐험 화면 플레이어 레벨 뱃지 */
+.player-level-badge {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    margin-left: 8px;
+}
+
+/* 자동 전투 배틀 화면 오버레이 */
+.auto-battle-overlay {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: rgba(0, 206, 201, 0.9);
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    z-index: 100;
+}
+
+.auto-battle-overlay .spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* 자동 전투 일시정지 버튼 */
+.auto-battle-pause-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ee5a24 0%, #f39c12 100%);
+    border: none;
+    color: white;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 1rem;
+    cursor: pointer;
+    z-index: 100;
+}
+
+/* 반응형 마이페이지 */
+@media (max-width: 400px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .profile-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .profile-level {
+        justify-content: center;
+    }
+}
+
+/* 플레이어 레벨업 알림 */
+.player-levelup-notification {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10000;
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    padding: 20px 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(240, 147, 251, 0.5);
+    animation: levelup-pop 0.5s ease, levelup-fade 3s ease forwards;
+}
+
+.levelup-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.levelup-icon {
+    font-size: 3rem;
+    animation: star-spin 1s linear infinite;
+}
+
+.levelup-text {
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.levelup-level {
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes levelup-pop {
+    0% { transform: translate(-50%, -50%) scale(0); }
+    50% { transform: translate(-50%, -50%) scale(1.2); }
+    100% { transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes levelup-fade {
+    0%, 70% { opacity: 1; }
+    100% { opacity: 0; }
+}
+
+@keyframes star-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
