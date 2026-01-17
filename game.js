@@ -1054,10 +1054,16 @@ async function tryCapture() {
     const ball = ITEMS[ballType];
 
     // 포획 확률 계산
-    // HP가 낮을수록, 희귀도가 낮을수록 포획률 상승
+    // HP가 낮을수록, 희귀도가 낮을수록, 레벨이 낮을수록 포획률 상승
     const hpPercent = wild.stats.hp / wild.stats.maxHp;
     const rarityMod = RARITY_WEIGHTS[wild.rarity] / RARITY_WEIGHTS.common;
-    const baseRate = 30 * ball.captureRate * (1 - hpPercent * 0.7) / rarityMod;
+
+    // 레벨 보정: 레벨이 높을수록 포획 어려움 (레벨 1~50 기준)
+    // 레벨 1: 1.0배, 레벨 10: 약 0.85배, 레벨 20: 약 0.7배, 레벨 50: 약 0.2배
+    const levelMod = Math.max(0.2, 1 - (wild.level - 1) * 0.016);
+
+    // 기본 포획률 = 기본값 * 볼보정 * HP보정 * 레벨보정 / 희귀도보정
+    const baseRate = 40 * ball.captureRate * (1 - hpPercent * 0.7) * levelMod / rarityMod;
 
     showScreen('capture-screen');
     document.getElementById('capture-message').textContent = '포획 중...';
