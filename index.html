@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>몬스터 헌터 - 포켓 어드벤처</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div id="game-container">
+        <!-- 로그인 화면 -->
+        <div id="login-screen" class="screen active">
+            <h1 class="game-title">🎮 몬스터 헌터</h1>
+            <p class="subtitle">포켓 어드벤처</p>
+            <div class="login-buttons">
+                <button onclick="signInWithGoogle()" class="google-btn">
+                    <span class="google-icon">G</span>
+                    Google로 로그인
+                </button>
+                <button onclick="playAsGuest()" class="guest-btn">
+                    게스트로 플레이
+                </button>
+            </div>
+            <p class="login-note">로그인하면 게임 데이터가 클라우드에 저장됩니다.</p>
+        </div>
+
+        <!-- 메인 메뉴 -->
+        <div id="main-menu" class="screen">
+            <div class="user-info" id="user-info">
+                <span id="user-display-name">게스트</span>
+                <button onclick="signOutUser()" id="logout-btn" class="small-btn">로그아웃</button>
+            </div>
+            <h1 class="game-title">🎮 몬스터 헌터</h1>
+            <p class="subtitle">포켓 어드벤처</p>
+            <div class="menu-buttons">
+                <button onclick="startNewGame()">새 게임</button>
+                <button onclick="continueGame()" id="continue-btn">이어하기</button>
+                <button onclick="showScreen('pokedex-screen')">도감</button>
+            </div>
+        </div>
+
+        <!-- 탐험 화면 -->
+        <div id="explore-screen" class="screen">
+            <div class="top-bar">
+                <div class="player-info">
+                    <span id="player-name">트레이너</span>
+                    <span id="player-balls">🔴 x <span id="ball-count">10</span></span>
+                </div>
+                <button class="menu-btn" onclick="showScreen('main-menu')">메뉴</button>
+            </div>
+            <h2>🗺️ 탐험할 지역을 선택하세요</h2>
+            <div class="region-grid" id="region-grid">
+                <!-- 지역들이 동적으로 추가됨 -->
+            </div>
+            <div class="bottom-nav">
+                <button onclick="showScreen('party-screen')">🐾 파티</button>
+                <button onclick="showScreen('pokedex-screen')">📖 도감</button>
+                <button onclick="showScreen('bag-screen')">🎒 가방</button>
+            </div>
+        </div>
+
+        <!-- 배틀 화면 -->
+        <div id="battle-screen" class="screen">
+            <div class="battle-arena">
+                <!-- 적 몬스터 -->
+                <div class="enemy-side">
+                    <div class="monster-info enemy-info">
+                        <span id="enemy-name">???</span>
+                        <span id="enemy-level">Lv.?</span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="enemy-hp-bar"></div>
+                        </div>
+                        <span class="hp-text" id="enemy-hp-text">??/??</span>
+                    </div>
+                    <div class="monster-sprite" id="enemy-sprite"></div>
+                </div>
+
+                <!-- 내 몬스터 -->
+                <div class="player-side">
+                    <div class="monster-sprite" id="player-sprite"></div>
+                    <div class="monster-info player-info">
+                        <span id="player-monster-name">???</span>
+                        <span id="player-monster-level">Lv.?</span>
+                        <div class="hp-bar">
+                            <div class="hp-fill" id="player-hp-bar"></div>
+                        </div>
+                        <span class="hp-text" id="player-hp-text">??/??</span>
+                        <div class="exp-bar">
+                            <div class="exp-fill" id="player-exp-bar"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 배틀 메시지 -->
+            <div class="battle-message" id="battle-message">
+                야생의 몬스터가 나타났다!
+            </div>
+
+            <!-- 배틀 메뉴 -->
+            <div class="battle-menu" id="battle-menu">
+                <button onclick="showSkills()">⚔️ 싸우기</button>
+                <button onclick="showSwitchMenu()">🔄 교체</button>
+                <button onclick="tryCapture()">🔴 포획</button>
+                <button onclick="runAway()">🏃 도망</button>
+            </div>
+
+            <!-- 스킬 메뉴 -->
+            <div class="skill-menu hidden" id="skill-menu">
+                <!-- 스킬들이 동적으로 추가됨 -->
+            </div>
+
+            <!-- 교체 메뉴 -->
+            <div class="switch-menu hidden" id="switch-menu">
+                <!-- 교체 가능한 몬스터들이 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 포획 애니메이션 -->
+        <div id="capture-screen" class="screen">
+            <div class="capture-animation">
+                <div class="pokeball" id="pokeball">🔴</div>
+                <div class="capture-message" id="capture-message">포획 중...</div>
+            </div>
+        </div>
+
+        <!-- 진화 화면 -->
+        <div id="evolve-screen" class="screen">
+            <div class="evolve-animation">
+                <div class="evolve-sprite" id="evolve-sprite">🔥</div>
+                <div class="evolve-message" id="evolve-message">진화 중...</div>
+            </div>
+        </div>
+
+        <!-- 도감 화면 -->
+        <div id="pokedex-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="goBack()">← 뒤로</button>
+                <h2>📖 몬스터 도감</h2>
+                <span id="pokedex-progress">0/0</span>
+            </div>
+            <div class="pokedex-grid" id="pokedex-grid">
+                <!-- 도감 항목들이 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 파티 화면 -->
+        <div id="party-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="goBack()">← 뒤로</button>
+                <h2>🐾 내 파티</h2>
+            </div>
+            <div class="party-grid" id="party-grid">
+                <!-- 파티 몬스터들이 동적으로 추가됨 -->
+            </div>
+            <h3>📦 보관함</h3>
+            <div class="storage-grid" id="storage-grid">
+                <!-- 보관함 몬스터들이 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 가방 화면 -->
+        <div id="bag-screen" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="goBack()">← 뒤로</button>
+                <h2>🎒 가방</h2>
+            </div>
+            <div class="bag-grid" id="bag-grid">
+                <!-- 아이템들이 동적으로 추가됨 -->
+            </div>
+        </div>
+
+        <!-- 몬스터 상세 정보 -->
+        <div id="monster-detail" class="screen">
+            <div class="screen-header">
+                <button class="back-btn" onclick="goBack()">← 뒤로</button>
+                <h2 id="detail-name">몬스터 이름</h2>
+            </div>
+            <div class="monster-detail-content">
+                <div class="detail-sprite" id="detail-sprite"></div>
+                <div class="detail-info">
+                    <p id="detail-type">속성: ???</p>
+                    <p id="detail-rarity">희귀도: ???</p>
+                    <p id="detail-description">설명...</p>
+                    <div class="detail-stats" id="detail-stats">
+                        <!-- 스탯들이 동적으로 추가됨 -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 결과 화면 -->
+        <div id="result-screen" class="screen">
+            <div class="result-content">
+                <h2 id="result-title">결과</h2>
+                <p id="result-message">메시지</p>
+                <div id="result-rewards"></div>
+                <button onclick="returnToExplore()">확인</button>
+            </div>
+        </div>
+
+        <!-- 로딩 오버레이 -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="loading-spinner"></div>
+            <p>로딩 중...</p>
+        </div>
+    </div>
+
+    <script src="data.js"></script>
+    <script src="auth.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
