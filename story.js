@@ -657,6 +657,12 @@ function showLocationScreen(locationId) {
 
 // NPC와 대화
 function talkToNpc(npcId) {
+    // 간호사인 경우 동적 대화 처리
+    if (npcId === 'nurse') {
+        showNurseDialogue();
+        return;
+    }
+
     // 해당 NPC의 현재 장소에서의 대화 씬 찾기
     const sceneId = `${npcId}_chat_${storyState.currentLocation}`;
 
@@ -675,6 +681,119 @@ function talkToNpc(npcId) {
     // 대화가 없으면 간단한 인사
     const npc = NPCS[npcId];
     showQuickDialogue(npc.name, `안녕하세요, ${gameState.playerName}!`);
+}
+
+// 간호사 동적 대화
+function showNurseDialogue() {
+    showScreen('story-dialogue-screen');
+
+    const speakerEl = document.getElementById('dialogue-speaker');
+    const textEl = document.getElementById('dialogue-text');
+    const portraitEl = document.getElementById('dialogue-portrait');
+    const choicesEl = document.getElementById('dialogue-choices');
+
+    speakerEl.textContent = '간호사 조이';
+    speakerEl.style.display = 'block';
+
+    // 간호사 이미지 설정
+    portraitEl.style.backgroundImage = `url('${IMAGE_PATHS.npcs}nurse_normal.png')`;
+    portraitEl.textContent = '';
+    portraitEl.classList.remove('narrator');
+
+    // 이미지 로드 실패 시 이모지
+    const testImg = new Image();
+    testImg.onerror = () => {
+        portraitEl.style.backgroundImage = 'none';
+        portraitEl.textContent = '👩‍⚕️';
+        portraitEl.style.fontSize = '4rem';
+        portraitEl.style.display = 'flex';
+        portraitEl.style.justifyContent = 'center';
+        portraitEl.style.alignItems = 'center';
+    };
+    testImg.src = `${IMAGE_PATHS.npcs}nurse_normal.png`;
+
+    // 파티 상태 확인
+    if (gameState.party.length === 0) {
+        textEl.textContent = `안녕하세요, ${gameState.playerName}님! 몬스터 센터에 오신 것을 환영해요. 아직 파트너 몬스터가 없으시네요. 모험을 시작하시면 언제든 찾아와 주세요! 💕`;
+        showNurseReturnHandler();
+        return;
+    }
+
+    // HP가 낮은 몬스터 찾기
+    const injuredMonsters = [];
+    const criticalMonsters = [];
+
+    gameState.party.forEach(monster => {
+        const hpPercent = (monster.stats.hp / monster.stats.maxHp) * 100;
+        const monsterName = MONSTERS[monster.id]?.name || monster.name || '몬스터';
+
+        if (hpPercent <= 0) {
+            criticalMonsters.push({ name: monsterName, hp: 0 });
+        } else if (hpPercent < 50) {
+            criticalMonsters.push({ name: monsterName, hp: Math.round(hpPercent) });
+        } else if (hpPercent < 100) {
+            injuredMonsters.push({ name: monsterName, hp: Math.round(hpPercent) });
+        }
+    });
+
+    let message = '';
+
+    if (criticalMonsters.length > 0) {
+        // 심각한 상태의 몬스터가 있음
+        const names = criticalMonsters.map(m => m.name).join(', ');
+        message = `어머, ${gameState.playerName}님! ${names}의 상태가 많이 안 좋아 보여요! 😰 빨리 치료해 드릴게요. 치료를 받으시겠어요?`;
+        portraitEl.style.backgroundImage = `url('${IMAGE_PATHS.npcs}nurse_normal.png')`;
+    } else if (injuredMonsters.length > 0) {
+        // 약간 다친 몬스터가 있음
+        const names = injuredMonsters.map(m => m.name).join(', ');
+        message = `안녕하세요, ${gameState.playerName}님! ${names}이(가) 조금 지쳐 보이네요. 치료해 드릴까요? 💊`;
+    } else {
+        // 모두 건강함
+        message = `안녕하세요, ${gameState.playerName}님! 어머, 몬스터들이 모두 건강하네요! ✨ 훌륭하게 관리하고 계시군요. 언제든 도움이 필요하면 찾아와 주세요! 💕`;
+        portraitEl.style.backgroundImage = `url('${IMAGE_PATHS.npcs}nurse_happy.png')`;
+        testImg.src = `${IMAGE_PATHS.npcs}nurse_happy.png`;
+        textEl.textContent = message;
+        showNurseReturnHandler();
+        return;
+    }
+
+    textEl.textContent = message;
+
+    // 선택지 표시
+    choicesEl.innerHTML = '';
+    choicesEl.classList.remove('hidden');
+
+    const healBtn = document.createElement('button');
+    healBtn.className = 'dialogue-choice-btn';
+    healBtn.textContent = '💊 네, 치료해 주세요!';
+    healBtn.onclick = () => {
+        choicesEl.classList.add('hidden');
+        healAllMonsters();
+    };
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'dialogue-choice-btn';
+    cancelBtn.textContent = '아니요, 괜찮아요';
+    cancelBtn.onclick = () => {
+        choicesEl.classList.add('hidden');
+        textEl.textContent = '알겠어요! 언제든 도움이 필요하면 말씀해 주세요. 😊';
+        showNurseReturnHandler();
+    };
+
+    choicesEl.appendChild(healBtn);
+    choicesEl.appendChild(cancelBtn);
+}
+
+// 간호사 대화 후 돌아가기 핸들러
+function showNurseReturnHandler() {
+    setTimeout(() => {
+        const dialogueBox = document.querySelector('.dialogue-box');
+        const returnHandler = () => {
+            dialogueBox.removeEventListener('click', returnHandler);
+            showLocationScreen(storyState.currentLocation);
+        };
+        dialogueBox.addEventListener('click', returnHandler);
+    }, 100);
 }
 
 // 간단한 대화 표시
