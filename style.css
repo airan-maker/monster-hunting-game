@@ -2239,3 +2239,244 @@ h3 {
     from { transform: rotate(0deg); }
     to { transform: rotate(360deg); }
 }
+
+/* ==================== 배틀 아이템 메뉴 스타일 ==================== */
+.item-menu {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(30, 30, 50, 0.95) 0%, rgba(20, 20, 35, 0.98) 100%);
+    border-radius: 20px 20px 0 0;
+    padding: 16px;
+    max-height: 60%;
+    overflow-y: auto;
+    z-index: 50;
+}
+
+.item-menu-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.item-menu-header span:first-child {
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.item-menu-header .current-hp {
+    color: #4ecdc4;
+    font-size: 0.85rem;
+}
+
+.item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.item-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.item-btn:hover {
+    background: linear-gradient(135deg, rgba(78, 205, 196, 0.3) 0%, rgba(78, 205, 196, 0.1) 100%);
+    border-color: #4ecdc4;
+    transform: translateX(5px);
+}
+
+.item-btn:active {
+    transform: translateX(5px) scale(0.98);
+}
+
+.item-emoji {
+    font-size: 2rem;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+}
+
+.item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.item-name {
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.item-effect {
+    color: #4ecdc4;
+    font-size: 0.85rem;
+}
+
+.item-count {
+    color: #ffd93d;
+    font-size: 1.1rem;
+    font-weight: bold;
+    background: rgba(255, 217, 61, 0.2);
+    padding: 4px 10px;
+    border-radius: 8px;
+}
+
+.item-cancel-btn {
+    width: 100%;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    color: #aaa;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.item-cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+}
+
+/* 파티 아이템 사용 메뉴 */
+.party-item-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.party-item-btn {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.party-item-btn:hover:not(.disabled) {
+    background: rgba(78, 205, 196, 0.2);
+    border-color: #4ecdc4;
+}
+
+.party-item-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.party-item-btn .monster-emoji {
+    font-size: 1.8rem;
+    width: 45px;
+    height: 45px;
+}
+
+.party-item-btn .monster-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.party-item-btn .monster-name {
+    color: white;
+    font-size: 0.95rem;
+    font-weight: bold;
+}
+
+.mini-hp-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.mini-hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4ecdc4, #44a08d);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.mini-hp-bar.low .mini-hp-fill {
+    background: linear-gradient(90deg, #f39c12, #e67e22);
+}
+
+.mini-hp-bar.critical .mini-hp-fill {
+    background: linear-gradient(90deg, #e74c3c, #c0392b);
+}
+
+.party-item-btn .hp-text {
+    color: #888;
+    font-size: 0.75rem;
+}
+
+.status-badge {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.status-badge.fainted {
+    background: rgba(231, 76, 60, 0.3);
+    color: #e74c3c;
+}
+
+.status-badge.full {
+    background: rgba(78, 205, 196, 0.3);
+    color: #4ecdc4;
+}
+
+.item-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.item-btn.disabled:hover {
+    transform: none;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.item-note {
+    position: absolute;
+    right: 10px;
+    font-size: 0.7rem;
+    color: #e74c3c;
+}
+
+.fainted-btn {
+    border-color: rgba(231, 76, 60, 0.3);
+}
+
+.fainted-btn:hover {
+    background: rgba(231, 76, 60, 0.2);
+    border-color: #e74c3c;
+}

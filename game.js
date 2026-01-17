@@ -15,7 +15,10 @@ let gameState = {
         greatball: 5,
         ultraball: 2,
         potion: 5,
-        super_potion: 2
+        super_potion: 2,
+        hyper_potion: 0,
+        revive: 2,
+        max_revive: 0
     },
     money: 1000,
     currentRegion: null
@@ -1132,10 +1135,302 @@ async function runAway() {
     }
 }
 
-// 가방 (배틀 중)
-function showBag() {
-    // TODO: 배틀 중 아이템 사용
-    showBattleMessage('아이템 사용은 준비 중입니다...');
+// 아이템 메뉴 표시 (배틀 중)
+function showItemMenu() {
+    if (battleState.battleEnded) return;
+
+    const itemMenu = document.getElementById('item-menu');
+
+    // 회복 아이템 목록
+    const healItems = ['potion', 'super_potion', 'hyper_potion'];
+    const reviveItems = ['revive', 'max_revive'];
+
+    const availableHealItems = healItems.filter(id => gameState.items[id] > 0);
+    const availableReviveItems = reviveItems.filter(id => gameState.items[id] > 0);
+
+    // 기절한 몬스터가 있는지 확인
+    const hasFaintedMonster = gameState.party.some(m => m.stats.hp <= 0);
+
+    if (availableHealItems.length === 0 && availableReviveItems.length === 0) {
+        showBattleMessage('사용할 수 있는 아이템이 없습니다!');
+        return;
+    }
+
+    // 현재 몬스터 HP 상태
+    const currentMonster = battleState.playerMonster;
+
+    let menuHTML = `
+        <div class="item-menu-header">
+            <span>🎒 아이템 사용</span>
+            <span class="current-hp">${currentMonster.name}: ${currentMonster.stats.hp}/${currentMonster.stats.maxHp} HP</span>
+        </div>
+        <div class="item-list">
+    `;
+
+    // 회복약 표시
+    availableHealItems.forEach(itemId => {
+        const item = ITEMS[itemId];
+        const count = gameState.items[itemId];
+        const healAmount = item.healAmount >= 9999 ? '전체' : item.healAmount;
+
+        menuHTML += `
+            <button class="item-btn" onclick="useHealItem('${itemId}')">
+                <span class="item-emoji">${item.emoji}</span>
+                <span class="item-info">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-effect">HP +${healAmount}</span>
+                </span>
+                <span class="item-count">x${count}</span>
+            </button>
+        `;
+    });
+
+    // 부활 아이템 표시 (기절한 몬스터가 있을 때만 활성화)
+    availableReviveItems.forEach(itemId => {
+        const item = ITEMS[itemId];
+        const count = gameState.items[itemId];
+        const revivePercent = item.reviveAmount >= 1 ? '전체' : '절반';
+        const disabled = !hasFaintedMonster;
+
+        menuHTML += `
+            <button class="item-btn ${disabled ? 'disabled' : ''}"
+                    onclick="${disabled ? '' : `showReviveMenu('${itemId}')`}"
+                    ${disabled ? 'disabled' : ''}>
+                <span class="item-emoji">${item.emoji}</span>
+                <span class="item-info">
+                    <span class="item-name">${item.name}</span>
+                    <span class="item-effect">부활 (HP ${revivePercent})</span>
+                </span>
+                <span class="item-count">x${count}</span>
+                ${disabled ? '<span class="item-note">기절한 몬스터 없음</span>' : ''}
+            </button>
+        `;
+    });
+
+    menuHTML += `
+        </div>
+        <button class="item-cancel-btn" onclick="hideItemMenu()">취소</button>
+    `;
+
+    itemMenu.innerHTML = menuHTML;
+    itemMenu.classList.remove('hidden');
+    document.getElementById('battle-menu').classList.add('hidden');
+}
+
+// 부활 대상 선택 메뉴
+function showReviveMenu(itemId) {
+    const itemMenu = document.getElementById('item-menu');
+    const item = ITEMS[itemId];
+
+    // 기절한 몬스터만 필터링
+    const faintedMonsters = gameState.party.map((m, i) => ({ monster: m, index: i }))
+        .filter(({ monster }) => monster.stats.hp <= 0);
+
+    if (faintedMonsters.length === 0) {
+        showBattleMessage('기절한 몬스터가 없습니다!');
+        return;
+    }
+
+    let menuHTML = `
+        <div class="item-menu-header">
+            <span>${item.emoji} ${item.name} 사용</span>
+            <span>어떤 몬스터를 부활시킬까요?</span>
+        </div>
+        <div class="party-item-list">
+    `;
+
+    faintedMonsters.forEach(({ monster, index }) => {
+        const monsterData = MONSTERS[monster.baseId];
+
+        menuHTML += `
+            <button class="party-item-btn fainted-btn" onclick="useReviveItem('${itemId}', ${index})">
+                <span class="monster-emoji">${monsterData?.emoji || monster.emoji}</span>
+                <span class="monster-info">
+                    <span class="monster-name">${monster.name} Lv.${monster.level}</span>
+                    <div class="mini-hp-bar critical">
+                        <div class="mini-hp-fill" style="width: 0%"></div>
+                    </div>
+                    <span class="hp-text">0/${monster.stats.maxHp}</span>
+                </span>
+                <span class="status-badge fainted">기절</span>
+            </button>
+        `;
+    });
+
+    menuHTML += `
+        </div>
+        <button class="item-cancel-btn" onclick="showItemMenu()">뒤로</button>
+    `;
+
+    itemMenu.innerHTML = menuHTML;
+}
+
+// 부활 아이템 사용
+async function useReviveItem(itemId, partyIndex) {
+    if (gameState.items[itemId] <= 0) return;
+
+    const item = ITEMS[itemId];
+    const monster = gameState.party[partyIndex];
+
+    if (monster.stats.hp > 0) {
+        showBattleMessage(`${monster.name}(은)는 기절하지 않았습니다!`);
+        return;
+    }
+
+    gameState.items[itemId]--;
+    const reviveHp = Math.floor(monster.stats.maxHp * item.reviveAmount);
+    monster.stats.hp = reviveHp;
+
+    hideItemMenu();
+
+    showBattleMessage(`${item.name}을(를) 사용했다! ${monster.name}(이)가 부활했다!`);
+    updateBattleUI();
+    saveGame();
+
+    await delay(1500);
+
+    // 적 턴
+    if (!battleState.battleEnded) {
+        await enemyTurn();
+
+        if (autoBattleState.isActive && !autoBattleState.isPaused && !battleState.battleEnded) {
+            runAutoBattleTurn();
+        }
+    }
+}
+
+// 아이템 메뉴 숨기기
+function hideItemMenu() {
+    document.getElementById('item-menu').classList.add('hidden');
+    document.getElementById('battle-menu').classList.remove('hidden');
+}
+
+// 회복 아이템 사용
+async function useHealItem(itemId) {
+    if (battleState.battleEnded) return;
+    if (gameState.items[itemId] <= 0) {
+        showBattleMessage('아이템이 없습니다!');
+        return;
+    }
+
+    const item = ITEMS[itemId];
+    const monster = battleState.playerMonster;
+
+    // HP가 이미 최대인 경우
+    if (monster.stats.hp >= monster.stats.maxHp) {
+        showBattleMessage(`${monster.name}의 HP가 이미 가득 찼습니다!`);
+        return;
+    }
+
+    // 아이템 사용
+    gameState.items[itemId]--;
+    const oldHp = monster.stats.hp;
+    const healAmount = item.healAmount >= 9999 ? monster.stats.maxHp : item.healAmount;
+    monster.stats.hp = Math.min(monster.stats.maxHp, monster.stats.hp + healAmount);
+    const actualHeal = monster.stats.hp - oldHp;
+
+    hideItemMenu();
+
+    // 메시지 표시
+    showBattleMessage(`${item.name}을(를) 사용했다! ${monster.name}의 HP가 ${actualHeal} 회복되었다!`);
+    updateBattleUI();
+    saveGame();
+
+    await delay(1500);
+
+    // 적 턴
+    if (!battleState.battleEnded) {
+        await enemyTurn();
+
+        // 자동 전투 계속
+        if (autoBattleState.isActive && !autoBattleState.isPaused && !battleState.battleEnded) {
+            runAutoBattleTurn();
+        }
+    }
+}
+
+// 파티 몬스터에게 아이템 사용 (배틀 중 다른 몬스터에게)
+function showPartyItemMenu(itemId) {
+    const itemMenu = document.getElementById('item-menu');
+    const item = ITEMS[itemId];
+
+    let menuHTML = `
+        <div class="item-menu-header">
+            <span>${item.emoji} ${item.name} 사용</span>
+            <span>어떤 몬스터에게 사용할까요?</span>
+        </div>
+        <div class="party-item-list">
+    `;
+
+    gameState.party.forEach((monster, index) => {
+        const monsterData = MONSTERS[monster.baseId];
+        const hpPercent = (monster.stats.hp / monster.stats.maxHp) * 100;
+        const isFainted = monster.stats.hp <= 0;
+        const isFullHp = monster.stats.hp >= monster.stats.maxHp;
+
+        let hpClass = '';
+        if (hpPercent <= 25) hpClass = 'critical';
+        else if (hpPercent <= 50) hpClass = 'low';
+
+        const disabled = isFainted || isFullHp;
+
+        menuHTML += `
+            <button class="party-item-btn ${disabled ? 'disabled' : ''}"
+                    onclick="${disabled ? '' : `useItemOnPartyMember('${itemId}', ${index})`}"
+                    ${disabled ? 'disabled' : ''}>
+                <span class="monster-emoji">${monsterData?.emoji || monster.emoji}</span>
+                <span class="monster-info">
+                    <span class="monster-name">${monster.name} Lv.${monster.level}</span>
+                    <div class="mini-hp-bar ${hpClass}">
+                        <div class="mini-hp-fill" style="width: ${hpPercent}%"></div>
+                    </div>
+                    <span class="hp-text">${monster.stats.hp}/${monster.stats.maxHp}</span>
+                </span>
+                ${isFainted ? '<span class="status-badge fainted">기절</span>' : ''}
+                ${isFullHp ? '<span class="status-badge full">최대</span>' : ''}
+            </button>
+        `;
+    });
+
+    menuHTML += `
+        </div>
+        <button class="item-cancel-btn" onclick="showItemMenu()">뒤로</button>
+    `;
+
+    itemMenu.innerHTML = menuHTML;
+}
+
+// 파티 멤버에게 아이템 사용
+async function useItemOnPartyMember(itemId, partyIndex) {
+    if (gameState.items[itemId] <= 0) return;
+
+    const item = ITEMS[itemId];
+    const monster = gameState.party[partyIndex];
+
+    if (monster.stats.hp <= 0 || monster.stats.hp >= monster.stats.maxHp) return;
+
+    gameState.items[itemId]--;
+    const oldHp = monster.stats.hp;
+    const healAmount = item.healAmount >= 9999 ? monster.stats.maxHp : item.healAmount;
+    monster.stats.hp = Math.min(monster.stats.maxHp, monster.stats.hp + healAmount);
+    const actualHeal = monster.stats.hp - oldHp;
+
+    hideItemMenu();
+
+    showBattleMessage(`${monster.name}에게 ${item.name}을(를) 사용했다! HP가 ${actualHeal} 회복되었다!`);
+    updateBattleUI();
+    saveGame();
+
+    await delay(1500);
+
+    // 적 턴
+    if (!battleState.battleEnded) {
+        await enemyTurn();
+
+        if (autoBattleState.isActive && !autoBattleState.isPaused && !battleState.battleEnded) {
+            runAutoBattleTurn();
+        }
+    }
 }
 
 // 결과 화면 표시

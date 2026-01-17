@@ -543,6 +543,20 @@ const ITEMS = {
         description: 'HP를 완전히 회복한다.',
         healAmount: 9999,
         price: 1500
+    },
+    revive: {
+        name: '기력의조각',
+        emoji: '💎',
+        description: '기절한 몬스터를 HP 절반으로 부활시킨다.',
+        reviveAmount: 0.5,
+        price: 1500
+    },
+    max_revive: {
+        name: '기력의덩어리',
+        emoji: '✨',
+        description: '기절한 몬스터를 HP 전체로 부활시킨다.',
+        reviveAmount: 1.0,
+        price: 4000
     }
 };
 
