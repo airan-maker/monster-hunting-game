@@ -212,7 +212,11 @@ monster-hunting-game/
 | `map_icon_cafe.png` | 48x48 | 카페 아이콘 |
 | `map_icon_forest.png` | 48x48 | 숲 아이콘 |
 | `map_icon_player.png` | 32x32 | 플레이어 위치 마커 |
-
+| `map_icon_town.png` | 48x48 | Hometown 아이콘 |
+| `map_icon_route.png` | 48x48 | 1번 도로 아이콘 |
+| `map_icon_lake.png` | 48x48 | 호수 아이콘 |
+| `map_icon_mountain.png` | 48x48 | 산기슭 아이콘 |
+| `map_icon_cave.png` | 32x32 | 동굴 입구 마커 |
 ---
 
 ## 5. 이미지 생성 팁

@@ -569,7 +569,22 @@ const IMAGE_PATHS = {
     backgrounds: 'images/backgrounds/',
     npcs: 'images/npcs/',
     locations: 'images/locations/',
-    player: 'images/player/'
+    player: 'images/player/',
+    icons: 'images/icons/'
+};
+
+// 맵 아이콘 파일명 매핑
+const MAP_ICONS = {
+    player_house: 'map_icon_house.png',
+    hometown: 'map_icon_town.png',
+    lab: 'map_icon_lab.png',
+    cafe: 'map_icon_cafe.png',
+    route1: 'map_icon_route.png',
+    forest_entrance: 'map_icon_forest.png',
+    forest_deep: 'map_icon_forest.png',
+    lake_area: 'map_icon_lake.png',
+    mountain_base: 'map_icon_mountain.png',
+    cave_entrance: 'map_icon_cave.png'
 };
 
 // NPC 데이터

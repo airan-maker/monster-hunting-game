@@ -432,13 +432,33 @@ function renderStoryMap() {
         if (isCurrent) locationEl.classList.add('current');
         if (hasEvent) locationEl.classList.add('has-event');
 
-        // 장소 아이콘
-        const iconEmoji = getLocationIcon(locationId);
+        // 장소 아이콘 (이미지 또는 이모지)
+        const iconPath = getLocationIconPath(locationId);
+        const iconEmoji = getLocationIconEmoji(locationId);
 
-        locationEl.innerHTML = `
-            <span class="icon">${iconEmoji}</span>
-            <span class="name">${location.name}</span>
-        `;
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'icon';
+
+        if (iconPath) {
+            const iconImg = document.createElement('img');
+            iconImg.src = iconPath;
+            iconImg.alt = location.name;
+            iconImg.className = 'map-icon-img';
+            iconImg.onerror = () => {
+                // 이미지 로드 실패 시 이모지로 대체
+                iconSpan.innerHTML = iconEmoji;
+            };
+            iconSpan.appendChild(iconImg);
+        } else {
+            iconSpan.textContent = iconEmoji;
+        }
+
+        const nameSpan = document.createElement('span');
+        nameSpan.className = 'name';
+        nameSpan.textContent = location.name;
+
+        locationEl.appendChild(iconSpan);
+        locationEl.appendChild(nameSpan);
 
         if (isUnlocked) {
             locationEl.addEventListener('click', () => enterLocation(locationId));
@@ -448,8 +468,8 @@ function renderStoryMap() {
     }
 }
 
-// 장소 아이콘 가져오기
-function getLocationIcon(locationId) {
+// 장소 아이콘 가져오기 (이모지 폴백)
+function getLocationIconEmoji(locationId) {
     const icons = {
         player_house: '🏠',
         hometown: '🏘️',
@@ -463,6 +483,14 @@ function getLocationIcon(locationId) {
         cave_entrance: '🕳️'
     };
     return icons[locationId] || '📍';
+}
+
+// 장소 아이콘 이미지 경로 가져오기
+function getLocationIconPath(locationId) {
+    if (MAP_ICONS[locationId]) {
+        return IMAGE_PATHS.icons + MAP_ICONS[locationId];
+    }
+    return null;
 }
 
 // 장소 이벤트 확인
@@ -572,7 +600,25 @@ function showLocationScreen(locationId) {
 
         const navBtn = document.createElement('button');
         navBtn.className = 'nav-location-btn';
-        navBtn.textContent = `${getLocationIcon(connectedId)} ${connectedLocation.name}`;
+
+        // 아이콘 이미지 또는 이모지 추가
+        const navIconPath = getLocationIconPath(connectedId);
+        const navIconEmoji = getLocationIconEmoji(connectedId);
+
+        if (navIconPath) {
+            const navIcon = document.createElement('img');
+            navIcon.src = navIconPath;
+            navIcon.className = 'nav-icon-img';
+            navIcon.alt = connectedLocation.name;
+            navIcon.onerror = () => {
+                navBtn.innerHTML = `${navIconEmoji} ${connectedLocation.name}`;
+            };
+            navBtn.appendChild(navIcon);
+            navBtn.appendChild(document.createTextNode(` ${connectedLocation.name}`));
+        } else {
+            navBtn.textContent = `${navIconEmoji} ${connectedLocation.name}`;
+        }
+
         navBtn.addEventListener('click', () => enterLocation(connectedId));
         navGrid.appendChild(navBtn);
     }
