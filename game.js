@@ -206,6 +206,36 @@ function restoreMainMenu() {
     }
 }
 
+// 스토리 모드에서 탐험 모드로 전환
+function goToExploreFromStory() {
+    // 스토리 진행 저장
+    if (typeof saveStoryProgress === 'function') {
+        saveStoryProgress();
+    }
+    saveGame();
+
+    // 탐험 화면으로 이동
+    showScreen('explore-screen');
+}
+
+// 탐험 모드에서 스토리 모드로 전환
+function goToStoryFromExplore() {
+    // 스토리 진행이 있는지 확인
+    if (gameState.storyProgress && gameState.storyProgress.isStoryMode) {
+        // 기존 스토리 진행 로드
+        if (typeof loadStoryProgress === 'function') {
+            loadStoryProgress();
+        }
+        storyState = { ...storyState, ...gameState.storyProgress };
+        showStoryMap();
+    } else {
+        // 스토리 진행이 없으면 새로 시작
+        if (typeof startStoryMode === 'function') {
+            startStoryMode();
+        }
+    }
+}
+
 // 화면 전환
 function showScreen(screenId) {
     // 현재 화면 저장
